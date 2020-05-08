@@ -1,7 +1,7 @@
 /*
 Thompson Tetrahedron Web App
 Author: Frederic Houlle
-email: frederic.paul.houlle@pm.me
+email: richowl-gitty@pm.me
 git:
 Date: 10.05.2020
 LICENSE INFO: Licensed under GNU-GPL-3.0-or-later
@@ -21,18 +21,22 @@ to some figures in my thesis. I hope it'll be useful to you.
 
 import * as THREE from './three/build/three.module.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
+import { CSS2DRenderer, CSS2DObject } from './three/examples/jsm/renderers/CSS2DRenderer.js';
 
 var container, controls;
-var camera, scene, renderer;
+var camera, scene, renderer, labelRenderer;
 var layers;
 var string_buffer;
 
-var coordinates_checked;
+var coordinates_checked, text_checked;
 var inner_lines_checked, faces_checked, lines_checked, inner_lines_checked;
 var twinning_checked, twinning_lines_checked, twinning_inner_lines_checked;
 
+var labels = [];
+
 var coordinates_axis = [];
+
+var checkbox_hashtable;
 
 var o, x, y, z;
 var coordinates_rotation_matrix;
@@ -66,14 +70,14 @@ function init() {
   container.id = "viewport";
   document.body.appendChild( container );
 
-  var checkbox_hashtable = [
-    {html_id: "show-coordinates-axis", checkbox: coordinates_checked, layers: [30]},
+  checkbox_hashtable = [
+    {html_id: "show-coordinates-axis", checkbox: coordinates_checked, layers: [28]},
     {html_id: "show-text", checkbox: text_checked, layers: [13, 14]},
-    {html_id: "show-faces", checkbox: faces_checked, layers: [0]},
+    {html_id: "show-faces", checkbox: faces_checked, layers: [15]},
     {html_id: "show-lines", checkbox: lines_checked, layers: [1, 5]},
     {html_id: "show-inner-lines", checkbox: inner_lines_checked, layers: [6]},
     {html_id: "show-twinning-tetrahedron", checkbox: twinning_checked, layers: [8]},
-    {html_id: "show-twinning-tetrahedron-lines", checkbox: twinning_lines_checked, layers: [2,9]},
+    {html_id: "show-twinning-tetrahedron-lines", checkbox: twinning_lines_checked, layers: [2, 9]},
     {html_id: "show-twinning-tetrahedron-inner-lines", checkbox: twinning_inner_lines_checked, layers: [10]},
   ]
 
@@ -127,7 +131,7 @@ function init() {
     d_material.side = THREE.DoubleSide;
     d_mesh = new THREE.Mesh( d_tet_geometry, d_material );
     d_mesh.layers.disableAll();
-    d_mesh.layers.set( 0 ); // layers definition for faces: 0
+    d_mesh.layers.set( 15 ); // layers definition for faces: 15
     faces.push( d_mesh );
     scene.add( d_mesh );
   };
@@ -198,6 +202,18 @@ function init() {
   rollOverMesh.layers.set(31); // rollOverMesh on the same layer as our
 	scene.add( rollOverMesh );
 
+  // labels
+  var verts = [A, B, C, D, a, b, c, d]
+  for (var i=0; i < verts.length; i++) {
+    verts[i].labelDiv = document.createElement( 'div' );
+    verts[i].labelDiv.className = 'label';
+    verts[i].labelDiv.textContent = verts.id;
+    verts[i].labelDiv.style.marginTop = '-1em';
+    verts[i].labelObject = new CSS2DObject( verts[i].labelDiv );
+    verts[i].labelObject.position.set( verts[i].pos );
+    labels.push( verts[i].labelObject );
+  }
+
   // create a perspective camera (FOV=45deg), set its position arbitrarily
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
   camera.rotation.set(Math.PI / 2, Math.PI / 2, Math.PI / 2);
@@ -220,6 +236,13 @@ function init() {
   renderer.toneMappingExposure = 0.8;
   renderer.outputEncoding = THREE.sRGBEncoding;
   container.appendChild( renderer.domElement );
+
+  // labelRenderer Setup
+  labelRenderer = new CSS2DRenderer();
+	labelRenderer.setSize( window.innerWidth, window.innerHeight );
+	labelRenderer.domElement.style.position = 'absolute';
+	labelRenderer.domElement.style.top = '0px';
+	document.body.appendChild( labelRenderer.domElement );
 
   // Camera controls and initial orientation setup
   controls = new OrbitControls( camera, renderer.domElement );
@@ -245,9 +268,9 @@ function init() {
 
 // Check which settings are set.
 function checkboxManager( event ) {
-  for (var i = 0; i < checkbox_hashtable.length; i++;) {
-    checkbox_hashtable[ i ].checkbox = getElementById(checkbox_hashtable[ i ].id).checked;
-    for (var j = 0; k < checkbox_hashtable[ i ].layers.length; j++){
+  for (var i = 0; i < checkbox_hashtable.length; i++) {
+    checkbox_hashtable[ i ].checkbox = document.getElementById(checkbox_hashtable[ i ].html_id).checked;
+    for (var j = 0; j < checkbox_hashtable[ i ].layers.length; j++){
       if (checkbox_hashtable[ i ].checkbox) {
         addLayerToViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
       } else {
@@ -263,8 +286,8 @@ function addLayerToViewAndRaycaster( layer ){
 }
 
 function removeLayerFromViewAndRaycaster( layer ){
-  camera.layers.enable(layer);
-  raycaster.layers.enable(layer);
+  camera.layers.disable(layer);
+  raycaster.layers.disable(layer);
 }
 
 // resize the camera aspect ratio accordingly if window resized
@@ -372,6 +395,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     b_v.round();
     var vector_string = b_v.x.toString() + " " + b_v.y.toString() + " " + b_v.z.toString();
 
+    // REFACTOR IF WANT: Probably best to just pass layer number in function args
     // create the line
     var line_geometry = new THREE.BufferGeometry().setFromPoints( points );
     var line = new THREE.LineSegments( line_geometry, material );
@@ -441,9 +465,9 @@ function createCoordinateAxis(){
   coordinates_axis.push( lx_mesh );
   coordinates_axis.push( ly_mesh );
   coordinates_axis.push( lz_mesh );
-  lx_mesh.layers.set(30);
-  ly_mesh.layers.set(30);
-  lz_mesh.layers.set(30);
+  lx_mesh.layers.set(28);
+  ly_mesh.layers.set(28);
+  lz_mesh.layers.set(28);
   scene.add( lx_mesh );
   scene.add( ly_mesh );
   scene.add( lz_mesh );
@@ -484,6 +508,9 @@ function rotateCoordinateAxis(){
   lx_mesh = new THREE.Line(lx, line_materials[0]);
   ly_mesh = new THREE.Line(ly, line_materials[1]);
   lz_mesh = new THREE.Line(lz, line_materials[2]);
+  lx_mesh.layers.set(28);
+  ly_mesh.layers.set(28);
+  lz_mesh.layers.set(28);
   scene.add(lx_mesh);
   scene.add(ly_mesh);
   scene.add(lz_mesh);
@@ -492,4 +519,5 @@ function rotateCoordinateAxis(){
 
 function render() {
   renderer.render( scene, camera );
+  labelRenderer.render( scene, camera);
 }

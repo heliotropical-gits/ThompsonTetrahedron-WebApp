@@ -62,17 +62,21 @@ li {
 
 #info {
   position: absolute;
-	width: 32%;
-  right: 60%
+  top:5px;
+	right: 75%
 	text-align: left;
-	z-index: 100;
+	z-index: 98;
 	display:block;
 }
 
 #settings {
+  overflow: hidden;
+  background: white;
   position: absolute;
-  left:60%;
-  width:40%;
+  width: 10vw
+  border-width: 1px;
+  border-color: black;
+  right: 1vw;
   text-align: right;
   display:block;
   list-style-type: none;
@@ -82,4 +86,21 @@ li {
 	user-select: none;
 	z-index: 99;
   color: #000000;
+}
+
+#settings-hide {
+  background: #cccccc;
+  position: absolute;
+  text-align: center;
+  padding: 2%;
+}
+
+#settings-hide:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+#settings-hide:active {
+  background: #0000ff;
+  color: #ffffff;
 }
