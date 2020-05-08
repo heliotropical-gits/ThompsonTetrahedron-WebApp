@@ -1,0 +1,85 @@
+/* style.css */
+/* Licensed under GNU-GPL-3.0-or-later */
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0%;
+  justify-content: center;
+  align-itens: center;
+}
+
+canvas {
+  position: absolute;
+  display: block;
+  z-index: 95;
+}
+
+input {
+  width: 15px;
+  border-width: 1px;
+  border-color: black;
+  font-weight: normal;
+}
+
+input:hover {
+  font-weight:normal;
+  border-color: #0000ff;
+  border-width: 1px;
+}
+
+li {
+    display: block;
+}
+
+.header {
+  position:absolute;
+  display: inline-block;
+  width: 95%;
+  left: 3%;
+  right: 3%;
+  height: 20%;
+}
+
+.monospace {
+  font-family: monospace, "Lucida Console", Courier;
+}
+
+.footer {
+  position: sticky;
+  top: 97%;
+  text-align: center;
+  z-index: 100;
+}
+
+#viewport {
+  position: absolute;
+  top: 0%;
+  z-index: 95;
+}
+
+#info {
+  position: absolute;
+	width: 32%;
+  right: 60%
+	text-align: left;
+	z-index: 100;
+	display:block;
+}
+
+#settings {
+  position: absolute;
+  left:60%;
+  width:40%;
+  text-align: right;
+  display:block;
+  list-style-type: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	z-index: 99;
+  color: #000000;
+}

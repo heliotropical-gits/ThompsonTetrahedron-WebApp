@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta license> Licensed under GNU-GPL-3.0-or-later
+		<title>Thompson Tetrahedron Applet</title>
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+		<link rel="manifest" href="/site.webmanifest">
+	</head>
+	<body>
+    <script type='module' src='scripts/thompson_tetrahedron_app.js'></script>
+		<noscript>"Your browser does not support javascript, or you've disabled scripts using e.g. NoScript. Please enable scripts to use the Thompson Tetrahedron."</noscript>
+		<div class="header monospace">
+		<div id="info">
+			<p>Mouse left click to rotate the view.</p>
+			<p>Mouse right click to translate the view.</p>
+			<p>Mouse wheel to zoom / unzoom. </p>
+		</div>
+		<div id="settings">
+				<div>
+					<ul>
+						<li class="cr boolean">
+							<div>
+								<span class="property-name">Show Coordinates Axis</span>
+								<div>
+									<input type="checkbox" id="show-coordinates-axis" checked="checked">
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Show Tetrahedron Faces</span>
+								<div>
+									<input type="checkbox" id="show-faces" checked="checked">
+								</div>
+							</div>
+						</li>
+						<li>
+						<div>
+							<span class="property-name">Show Lines</span>
+							<div>
+								<input type="checkbox" id="show-lines" checked="checked">
+							</div>
+						</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Show Inner a/3 Vectors</span>
+								<div>
+									<input type="checkbox" id="show-inner-lines">
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Show Text</span>
+								<div>
+									<input type="checkbox" id="show-text" checked="checked">
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Show Twinning Tetrahedron (TT)</span>
+								<div>
+									<input type="checkbox" id="show-twinning-tetrahedron">
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Show TT Lines</span>
+								<div>
+									<input type="checkbox" id="show-twinning-tetrahedron-lines">
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Show TT a/3 Vectors</span>
+								<div>
+									<input type="checkbox" id="show-twinning-tetrahedron-inner-lines">
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Coordinates Basis</span>
+								<div>
+									<form>
+										<label style="color: red;">x</label>
+										<input type="text" id="xx" name="xx" value=1 maxlength=2><input type="text" id="xy" name="xy" value=0 maxlength=2><input type="text" id="xz" name="xz" value=0 maxlength=2><br>
+										<label style="color: green;">y</label>
+										<input type="text" id="yx" name="yx" value=0 maxlength=2><input type="text" id="yy" name="yy" value=1 maxlength=2><input type="text" id="yz" name="yz" value=0 maxlength=2><br>
+										<label style="color: blue;">z</label>
+										<input type="text" id="zx" name="zx" value=0 maxlength=2><input type="text" id="zy" name="zy" value=0 maxlength=2><input type="text" id="zz" name="zz" value=1 maxlength=2><br>
+									</form>
+									<button type="button" id="apply-button">Apply</button>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			</div>
+			<div class="footer monospace">
+				<span class="footer-text">Thompson tetrahedron web app by <a href="http://www.gmp.ww.uni-erlangen.de/people_show.php?id_p=69">Frédéric Houllé</a></span><br>
+				<span class="footer-text">Git <a href="https://github.com/Richowl/ThompsonTetrahedron-WebApp">here</a>, © 2020 Frédéric Houllé</span><br>
+				<span class="footer-text">Licensed under GPL-3.0-or-later</span><br>
+				<span class="footer-text">Requires IE version > 8, or any other modern web browser</span>
+			</div>
+	</body>
+</html>
