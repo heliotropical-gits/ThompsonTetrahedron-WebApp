@@ -28,6 +28,10 @@ var camera, scene, renderer;
 var layers;
 var string_buffer;
 
+var coordinates_checked;
+var inner_lines_checked, faces_checked, lines_checked, inner_lines_checked;
+var twinning_checked, twinning_lines_checked, twinning_inner_lines_checked;
+
 var coordinates_axis = [];
 
 var o, x, y, z;
@@ -51,6 +55,7 @@ var line_materials = [];
 var rollOverMaterial, rollOverMesh;
 
 var raycaster, mouse;
+var dynamic_text_planes = [];
 
 init();
 render();
@@ -60,6 +65,17 @@ function init() {
   container = document.createElement( 'div' );
   container.id = "viewport";
   document.body.appendChild( container );
+
+  var checkbox_hashtable = [
+    {html_id: "show-coordinates-axis", checkbox: coordinates_checked, layers: [30]},
+    {html_id: "show-text", checkbox: text_checked, layers: [13, 14]},
+    {html_id: "show-faces", checkbox: faces_checked, layers: [0]},
+    {html_id: "show-lines", checkbox: lines_checked, layers: [1, 5]},
+    {html_id: "show-inner-lines", checkbox: inner_lines_checked, layers: [6]},
+    {html_id: "show-twinning-tetrahedron", checkbox: twinning_checked, layers: [8]},
+    {html_id: "show-twinning-tetrahedron-lines", checkbox: twinning_lines_checked, layers: [2,9]},
+    {html_id: "show-twinning-tetrahedron-inner-lines", checkbox: twinning_inner_lines_checked, layers: [10]},
+  ]
 
   // create scene, set its background to white
   scene = new THREE.Scene();
@@ -229,76 +245,26 @@ function init() {
 
 // Check which settings are set.
 function checkboxManager( event ) {
-  var coordinates_checked = document.getElementById("show-coordinates-axis").checked;
-  var faces_checked = document.getElementById("show-faces").checked;
-  var lines_checked = document.getElementById("show-lines").checked;
-  var twinning_checked = document.getElementById("show-twinning-tetrahedron").checked;
-  var twinning_lines_checked = document.getElementById("show-twinning-tetrahedron-lines").checked;
-  var twinning_inner_lines_checked = document.getElementById("show-twinning-tetrahedron-inner-lines").checked;
-  var inner_lines_checked = document.getElementById("show-inner-lines").checked;
+  for (var i = 0; i < checkbox_hashtable.length; i++;) {
+    checkbox_hashtable[ i ].checkbox = getElementById(checkbox_hashtable[ i ].id).checked;
+    for (var j = 0; k < checkbox_hashtable[ i ].layers.length; j++){
+      if (checkbox_hashtable[ i ].checkbox) {
+        addLayerToViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+      } else {
+        removeLayerFromViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+      }
+    }
+  }
+}
 
-  if ( coordinates_checked ) {
-    camera.layers.enable(30); // 6 is the inner lines layer
-    raycaster.layers.enable(30);
-  } else {
-    camera.layers.disable(30); // 6 is the inner lines layer
-    raycaster.layers.disable(30);
-  }
-  if ( faces_checked ) {
-    for (var i = 0; i < 4; i++){
-      faces[ i ].visible = true;
-    }
-  } else {
-    for (var i = 0; i < 4; i++){
-      faces[ i ].visible = false;
-    }
-  }
-  if ( lines_checked ) {
-    camera.layers.enable(1); // 1 is the direct edge lines layer
-    camera.layers.enable(5); // 5 is the direct partial lines layer
-    raycaster.layers.enable(1);
-    raycaster.layers.enable(5);
-  } else {
-    camera.layers.disable(1); // 1 is the direct edge lines layer
-    camera.layers.disable(5); // 1 is the direct partial lines layer
-    raycaster.layers.disable(1);
-    raycaster.layers.disable(5);
-  }
-  if ( inner_lines_checked ) {
-    camera.layers.enable(6); // 6 is the inner lines layer
-    raycaster.layers.enable(6);
-  } else {
-    camera.layers.disable(6);
-    raycaster.layers.disable(6);
-  }
-  if ( twinning_checked ) {
-    for (var i = 0; i < 4; i++){
-      t_faces[ i ].visible = true;
-    }
-  } else {
-    for (var i = 0; i < 4; i++){
-      t_faces[ i ].visible = false;
-    }
-  }
-  if ( twinning_lines_checked ) {
-    camera.layers.enable(2); // twinning tet edge lines layer is 2
-    camera.layers.enable(9); // twinning tet partial lines layer is 9
-    raycaster.layers.enable(2);
-    raycaster.layers.enable(9);
-  } else {
-    camera.layers.disable(2);
-    camera.layers.disable(9);
-    raycaster.layers.disable(2);
-    raycaster.layers.disable(9);
-  }
-  if ( twinning_inner_lines_checked ) {
-    camera.layers.enable(10); // 10 is the twinning inner lines layer
-    raycaster.layers.enable(10);
-  } else {
-    camera.layers.disable(10);
-    raycaster.layers.disable(10);
-  }
-  render();
+function addLayerToViewAndRaycaster( layer ){
+  camera.layers.enable(layer);
+  raycaster.layers.enable(layer);
+}
+
+function removeLayerFromViewAndRaycaster( layer ){
+  camera.layers.enable(layer);
+  raycaster.layers.enable(layer);
 }
 
 // resize the camera aspect ratio accordingly if window resized
