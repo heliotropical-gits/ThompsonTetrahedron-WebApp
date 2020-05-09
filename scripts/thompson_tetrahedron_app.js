@@ -2,23 +2,25 @@
 Thompson Tetrahedron Web App
 Author: Frederic Houlle
 email: richowl-gitty@pm.me
-git:
+git: 
 Date: 10.05.2020
 
 Licensed under GNU-GPL-3.0-or-later
 Copyright 2020 Frederic Houlle
 
-This script builds and displays an interactive Thompson Tetrahedron
-you can use for studying / as a reference for dislocation slip systems
-in FCC crystals.
-Interactivity includes displaying specific slip system info on click,
-coordinate axis rotation, hiding and displaying specific features, and
-displaying a twinning (mirror) Thompson Tetrahedron following a (111) twinning plane.
+License notice
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Built this as a CV/portfolio piece for displaying javascript, html and CSS proficiency
-+ bragging rights + Covid-19 lockdown boredom + it was fun.
-Also, it turned out to be useful for quickly adding an annotated Thompson Tetrahedron
-to some figures in my thesis. I hope it'll be useful to you.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import * as THREE from './three/build/three.module.js';
