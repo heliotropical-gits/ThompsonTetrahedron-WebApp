@@ -257,6 +257,7 @@ function init() {
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
   document.addEventListener( 'mouseup', onDocumentMouseUp, false );
   document.getElementById( "apply-button" ).addEventListener( 'click', rotateCoordinateAxis, false );
+  document.getElementById( "settings-toggle" ).addEventListener( 'click', toggleSettings, false );
   window.addEventListener( 'resize', onWindowResize, false );
 
   createCoordinateAxis();
@@ -515,6 +516,19 @@ function rotateCoordinateAxis(){
   scene.add(ly_mesh);
   scene.add(lz_mesh);
   render();
+}
+
+function toggleSettings() {
+  var settings = document.getElementById("settings-sub");
+  if (settings.style.display === "none") {
+    settings.style.display = "block";
+    document.getElementById("settings-toggle-text").innerHTML = "> hide";
+    document.getElementById("settings-toggle").style.right = "75%";
+  } else {
+    settings.style.display = "none";
+    document.getElementById("settings-toggle-text").innerHTML = "< show";
+    document.getElementById("settings-toggle").style.right = "-10%";
+  }
 }
 
 function render() {

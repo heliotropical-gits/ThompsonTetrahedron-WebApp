@@ -69,38 +69,51 @@ li {
 	display:block;
 }
 
-#settings {
-  overflow: hidden;
-  background: white;
+#settings-outer {
   position: absolute;
-  width: 10vw
-  border-width: 1px;
-  border-color: black;
-  right: 1vw;
+  width:18em;
+  right: 4vw;
+  top: 0.5vw;
   text-align: right;
   display:block;
   list-style-type: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	z-index: 99;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  z-index: 99;
   color: #000000;
 }
 
-#settings-hide {
-  background: #cccccc;
-  position: absolute;
-  text-align: center;
-  padding: 2%;
+#settings-sub {
+  position: relative;
+  background: white;
+  padding: 4px 4px 4px 4px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #000000;
+  float: right;
+  right: -2.5vw;
 }
 
-#settings-hide:hover {
+#settings-toggle {
+  position: absolute;
+  background: #cccccc;
+  top: 1vw;
+  right: 75%;
+  width: 2.5em;
+  position: absolute;
+  text-align: center;
+  padding: 0.5vw;
+  z-index: 100;
+}
+
+#settings-toggle:hover {
   background: #000000;
   color: #ffffff;
 }
 
-#settings-hide:active {
+#settings-toggle:active {
   background: #0000ff;
   color: #ffffff;
 }
