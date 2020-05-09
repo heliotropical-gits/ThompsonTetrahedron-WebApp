@@ -4,7 +4,9 @@ Author: Frederic Houlle
 email: richowl-gitty@pm.me
 git:
 Date: 10.05.2020
-LICENSE INFO: Licensed under GNU-GPL-3.0-or-later
+
+Licensed under GNU-GPL-3.0-or-later
+Copyright 2020 Frederic Houlle
 
 This script builds and displays an interactive Thompson Tetrahedron
 you can use for studying / as a reference for dislocation slip systems
