@@ -2,7 +2,7 @@
 Thompson Tetrahedron Web App
 Author: Frederic Houlle
 email: richowl-gitty@pm.me
-git: 
+git:
 Date: 10.05.2020
 
 Licensed under GNU-GPL-3.0-or-later
@@ -201,7 +201,7 @@ function init() {
 
   // Line roll-over helper sphere
   var rollOverGeo = new THREE.SphereBufferGeometry( 0.01, 10, 10 );
-	rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.6, transparent: true} );
+	rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1.0, transparent: false} );
 	rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
   rollOverMesh.layers.set(31); // rollOverMesh on the same layer as our
 	scene.add( rollOverMesh );
@@ -283,6 +283,7 @@ function checkboxManager( event ) {
       }
     }
   }
+  render();
 }
 
 function addLayerToViewAndRaycaster( layer ){
@@ -400,7 +401,6 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     b_v.round();
     var vector_string = b_v.x.toString() + " " + b_v.y.toString() + " " + b_v.z.toString();
 
-    // REFACTOR IF WANT: Probably best to just pass layer number in function args
     // create the line
     var line_geometry = new THREE.BufferGeometry().setFromPoints( points );
     var line = new THREE.LineSegments( line_geometry, material );
@@ -441,7 +441,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
 function onDocumentMouseUp( event ){
   /* Timeout one: once we've released the mouse, the box unchecks/checks
   and THEN we can see if it was checked or unchecked. */
-  setTimeout(() => { checkboxManager(); }, 1);
+  setTimeout(() => { checkboxManager(); }, 3);
   render();
 }
 
