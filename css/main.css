@@ -26,7 +26,7 @@ input {
 }
 
 input:hover {
-  font-weight:normal;
+  font-weight: normal;
   border-color: #0000ff;
   border-width: 1px;
 }

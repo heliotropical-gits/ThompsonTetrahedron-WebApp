@@ -74,15 +74,16 @@ function init() {
   container.id = "viewport";
   document.body.appendChild( container );
 
+  // BOOKMARK: Layers Definitions
   checkbox_hashtable = [
-    {html_id: "show-coordinates-axis", checkbox: coordinates_checked, layers: [28]},
-    {html_id: "show-text", checkbox: text_checked, layers: [13, 14]},
-    {html_id: "show-faces", checkbox: faces_checked, layers: [15]},
-    {html_id: "show-lines", checkbox: lines_checked, layers: [1, 5]},
-    {html_id: "show-inner-lines", checkbox: inner_lines_checked, layers: [6]},
-    {html_id: "show-twinning-tetrahedron", checkbox: twinning_checked, layers: [8]},
-    {html_id: "show-twinning-tetrahedron-lines", checkbox: twinning_lines_checked, layers: [2, 9]},
-    {html_id: "show-twinning-tetrahedron-inner-lines", checkbox: twinning_inner_lines_checked, layers: [10]},
+    { html_id: "show-coordinates-axis", checkbox: coordinates_checked, layers: [ 28 ] },
+    { html_id: "show-text", checkbox: text_checked, layers: [ 13, 14 ] },
+    { html_id: "show-faces", checkbox: faces_checked, layers: [ 15 ] },
+    { html_id: "show-lines", checkbox: lines_checked, layers: [ 1, 5 ] },
+    { html_id: "show-inner-lines", checkbox: inner_lines_checked, layers: [ 6 ] },
+    { html_id: "show-twinning-tetrahedron", checkbox: twinning_checked, layers: [ 8 ] },
+    { html_id: "show-twinning-tetrahedron-lines", checkbox: twinning_lines_checked, layers: [ 2, 9 ] },
+    { html_id: "show-twinning-tetrahedron-inner-lines", checkbox: twinning_inner_lines_checked, layers: [ 10 ] },
   ]
 
   // create scene, set its background to white
@@ -91,7 +92,7 @@ function init() {
 
   // add a soft white light to the scene
   var light1 = new THREE.AmbientLight( 0xffffff );
-  light1.layers.set(32);
+  light1.layers.set( 32 );
   scene.add( light1 );
 
   //// Create direct tetrahedron -> We define it from scratch from individual faces so we can more easily
@@ -99,30 +100,30 @@ function init() {
   // Yes, I know there's a TetrahedronBufferGeometry object in three.js
 
   // Define corner vertices, and center face vertices
-  var A = {id: 'A', pos: [1.0, 0.0, 1.0]};
-  var B = {id: 'B', pos: [0.0, 1.0, 1.0]};
-  var C = {id: 'C', pos: [1.0, 1.0, 0.0]};
-  var D = {id: 'D', pos: [0.0, 0.0, 0.0]};
-  var Dp = {id: 'D\'', pos: [1.334, 1.334, 1.334]}; // D prime, the (evil) twin mirror of D.
-  var a = {id: 'α', pos: [0.332, 0.667, 0.332]};
-  var b = {id: 'β', pos: [0.667, 0.332, 0.332]};
-  var c = {id: 'γ', pos: [0.332, 0.332, 0.667]};
-  var d = {id: '𝛿', pos: [0.667, 0.667, 0.667]};
-  var ap = {id: 'α\'', pos: [0.8, 1.123, 0.8]};
-  var bp = {id: 'β\'', pos: [1.123, 0.8, 0.8]};
-  var cp = {id: 'γ\'', pos: [0.8, 0.8, 1.123]};
-  var d_corner_vertices = [A, B, C, D];
-  var t_corner_vertices = [A, B, C, Dp];
-  var d_colors = [0xffffff, 0xff0000, 0x00ff00, 0x1111ff]; // tetrahedron face colors
-  var t_colors = [0xffffff, 0xff4444, 0x44ff44, 0x5555ff]; // twinning tetrahedron face colors (same but paler)
+  var A = { id: 'A', pos: [ 1.0, 0.0, 1.0 ] };
+  var B = { id: 'B', pos: [ 0.0, 1.0, 1.0 ] };
+  var C = { id: 'C', pos: [ 1.0, 1.0, 0.0 ] };
+  var D = { id: 'D', pos: [ 0.0, 0.0, 0.0 ] };
+  var Dp = { id: 'D\'', pos: [ 1.334, 1.334, 1.334 ] }; // D prime, the (evil) twin mirror of D.
+  var a = { id: 'α', pos: [ 0.332, 0.667, 0.332] };
+  var b = { id: 'β', pos: [ 0.667, 0.332, 0.332] };
+  var c = { id: 'γ', pos: [ 0.332, 0.332, 0.667] };
+  var d = { id: '𝛿', pos: [ 0.667, 0.667, 0.667] };
+  var ap = { id: 'α\'', pos: [ 0.8, 1.123, 0.8 ] };
+  var bp = { id: 'β\'', pos: [ 1.123, 0.8, 0.8 ] };
+  var cp = { id: 'γ\'', pos: [ 0.8, 0.8, 1.123 ] };
+  var d_corner_vertices = [ A, B, C, D ];
+  var t_corner_vertices = [ A, B, C, Dp ];
+  var d_colors = [ 0xffffff, 0xff0000, 0x00ff00, 0x1111ff ]; // tetrahedron face colors
+  var t_colors = [ 0xffffff, 0xff4444, 0x44ff44, 0x5555ff ]; // twinning tetrahedron face colors (same but paler)
 
   // create each side
-  for (var i = 0; i < 4; i++) {
+  for ( var i = 0; i < 4; i++ ) {
     // create each face mesh
     var d_tet_geometry = new THREE.BufferGeometry();
     //var d_vertices = d_corner_vertices.slice(i*9, (i + 1)*9 ) // Picks 9 elements at a time, i.e. 3 points in 3D space
     // use a rolling index for the corner vertices, i.e. after picking [1,2,3], pick [2,3,0]
-    d_vertices = [d_corner_vertices[i % 4].pos, d_corner_vertices[(i + 1) % 4].pos, d_corner_vertices[(i + 2) % 4].pos];
+    d_vertices = [ d_corner_vertices[ i % 4 ].pos, d_corner_vertices[ ( i + 1 ) % 4 ].pos, d_corner_vertices[ ( i + 2 ) % 4 ].pos ];
     d_vertices_typed = new Float32Array([
       d_vertices[0][0], d_vertices[0][1], d_vertices[0][2],
       d_vertices[1][0], d_vertices[1][1], d_vertices[1][2],
@@ -142,8 +143,8 @@ function init() {
 
   //// create lines for the vectors
   // edges: AB, BC, CD, DA, BD, DC
-  var d_corner_vertex_pairs = [[A, B], [B, C], [C, D], [D, A], [B, D], [C, A]];
-  makeLinesFromPairs(d_corner_vertex_pairs, "full");
+  var d_corner_vertex_pairs = [ [A, B], [B, C], [C, D], [D, A], [B, D], [C, A] ];
+  makeLinesFromPairs( d_corner_vertex_pairs, "full" );
 
   // create partial vectors, on the faces.
   var d_corner_to_center_vertex_pairs = [
@@ -152,21 +153,21 @@ function init() {
     [A, b], [C, b], [D, b], // (b) plane
     [B, c], [D, c], [A, c], // (c) plane
   ]
-  makeLinesFromPairs(d_corner_to_center_vertex_pairs, "partial");
+  makeLinesFromPairs( d_corner_to_center_vertex_pairs, "partial" );
 
   // create inner vectors
-  var d_center_to_center_vertex_pairs = [[a, b], [b, c], [c, d], [d, a], [d, b], [c, a]];
-  makeLinesFromPairs(d_center_to_center_vertex_pairs, "inner");
+  var d_center_to_center_vertex_pairs = [ [a, b], [b, c], [c, d], [d, a], [d, b], [c, a] ];
+  makeLinesFromPairs( d_center_to_center_vertex_pairs, "inner")  ;
 
   //// Create the twinning tetrahedron
 
   // faces
-  for (var i = 0; i < 4; i++) {
+  for ( var i = 0; i < 4; i++ ) {
     // create each face mesh
     var t_tet_geometry = new THREE.BufferGeometry();
     //var d_vertices = d_corner_vertices.slice(i*9, (i + 1)*9 ) // Picks 9 elements at a time, i.e. 3 points in 3D space
     // use a rolling index for the corner vertices, i.e. after picking [1,2,3], pick [2,3,0]
-    t_vertices = [t_corner_vertices[i % 4].pos, t_corner_vertices[(i + 1) % 4].pos, t_corner_vertices[(i + 2) % 4].pos];
+    t_vertices = [t_corner_vertices[ i % 4 ].pos, t_corner_vertices[ ( i + 1 ) % 4 ].pos, t_corner_vertices[ ( i + 2 ) % 4 ].pos];
     t_vertices_typed = new Float32Array([
       t_vertices[0][0], t_vertices[0][1], t_vertices[0][2],
       t_vertices[1][0], t_vertices[1][1], t_vertices[1][2],
@@ -185,8 +186,8 @@ function init() {
   };
 
   // edge vectors
-  var t_corner_vertex_pairs = [[C, Dp], [Dp, A], [B, Dp]];
-  makeLinesFromPairs(t_corner_vertex_pairs, "full", true);
+  var t_corner_vertex_pairs = [ [C, Dp], [Dp, A], [B, Dp] ];
+  makeLinesFromPairs( t_corner_vertex_pairs, "full", true );
   // partial vectors
   var t_corner_to_center_vertex_pairs = [
     [A, d], [B, d], [C, d],
@@ -194,21 +195,21 @@ function init() {
     [A, bp], [C, bp], [Dp, bp],
     [B, cp], [Dp, cp], [A, cp],
   ];
-  makeLinesFromPairs(t_corner_to_center_vertex_pairs, "partial", true);
+  makeLinesFromPairs( t_corner_to_center_vertex_pairs, "partial", true );
   // inner vectors
-  var t_center_to_center_vertex_pairs = [[ap, bp], [bp, cp], [cp, d], [d, ap], [d, bp], [cp, ap]];
-  makeLinesFromPairs(t_center_to_center_vertex_pairs, "inner", true);
+  var t_center_to_center_vertex_pairs = [ [ap, bp], [bp, cp], [cp, d], [d, ap], [d, bp], [cp, ap] ];
+  makeLinesFromPairs( t_center_to_center_vertex_pairs, "inner", true );
 
   // Line roll-over helper sphere
   var rollOverGeo = new THREE.SphereBufferGeometry( 0.01, 10, 10 );
 	rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1.0, transparent: false} );
 	rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-  rollOverMesh.layers.set(31); // rollOverMesh on the same layer as our
+  rollOverMesh.layers.set( 31 ); // rollOverMesh on the same layer as our
 	scene.add( rollOverMesh );
 
   // labels
-  var verts = [A, B, C, D, a, b, c, d]
-  for (var i=0; i < verts.length; i++) {
+  var verts = [ A, B, C, D, a, b, c, d ]
+  for (var i = 0; i < verts.length; i++ ) {
     verts[i].labelDiv = document.createElement( 'div' );
     verts[i].labelDiv.className = 'label';
     verts[i].labelDiv.textContent = verts.id;
@@ -227,7 +228,7 @@ function init() {
   // Raycaster and mouse definitions
   raycaster = new THREE.Raycaster();
   raycaster.layers.enableAll();
-  raycaster.layers.disable(0);
+  raycaster.layers.disable( 0 );
   // Raycaster parameters
   raycaster.params.Line.threshold = 0.03
   mouse = new THREE.Vector2();
@@ -287,13 +288,13 @@ function checkboxManager( event ) {
 }
 
 function addLayerToViewAndRaycaster( layer ){
-  camera.layers.enable(layer);
-  raycaster.layers.enable(layer);
+  camera.layers.enable( layer );
+  raycaster.layers.enable( layer );
 }
 
 function removeLayerFromViewAndRaycaster( layer ){
-  camera.layers.disable(layer);
-  raycaster.layers.disable(layer);
+  camera.layers.disable( layer );
+  raycaster.layers.disable( layer );
 }
 
 // resize the camera aspect ratio accordingly if window resized
@@ -331,16 +332,16 @@ function onDocumentMouseMove( event ) {
 function onDocumentMouseDown( event ){
   raycaster.setFromCamera( mouse, camera );
   var intersects = raycaster.intersectObjects( lines, true );
-  var t_intersects = raycaster.intersectObjects( t_lines, true);
+  var t_intersects = raycaster.intersectObjects( t_lines, true );
   if ( intersects.length > 0 || t_intersects.length > 0 ){
     if ( intersects.length > 0 ) {
-      var intersect = intersects[0];
+      var intersect = intersects[ 0 ];
     } else {
-      var intersect = t_intersects[0]
+      var intersect = t_intersects[ 0 ]
     }
-    console.log(intersect);
-    console.log(intersect.object.thompsonNotation);
-    console.log(intersect.object.burgersVector);
+    console.log( intersect );
+    console.log( intersect.object.thompsonNotation );
+    console.log( intersect.object.burgersVector );
   }
   render();
 }
@@ -352,32 +353,32 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     material = new THREE.LineBasicMaterial({
       color: 0x000000,
       linewidth: 2
-    });
+    } );
     prefactor = "a/2";
   } else if (materialToUse === "partial") {
     b_length = 2.449489742783178;
-    material = new THREE.LineDashedMaterial({
+    material = new THREE.LineDashedMaterial( {
       color: 0x000000,
       linewidth: 2,
   	  dashSize: 3,
   	  gapSize: 1
-    });
+    } );
     prefactor = "a/6";
   }
-    else if (materialToUse === "inner") {
+    else if ( materialToUse === "inner" ) {
       b_length = 1.414213562373095;
-      material = new THREE.LineDashedMaterial({
+      material = new THREE.LineDashedMaterial( {
         color: 0x00ffff,
         linewidth: 2,
     	  dashSize: 3,
     	  gapSize: 1
-      });
+      } );
       prefactor = "a/3";
     }
-    if (materialToUse === "inner" && twinningCase) {
-      material.color.set(0xff00ff);
+    if ( materialToUse === "inner" && twinningCase ) {
+      material.color.set( 0xff00ff );
     }
-  for (var i = 0; i < pointsPairs.length; i++){
+  for ( var i = 0; i < pointsPairs.length; i++ ){
     // Define a pair of points to make a line
     var v1  = new THREE.Vector3(
       pointsPairs[i][0].pos[0],
@@ -397,7 +398,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
       v2.y - v1.y,
       v2.z - v1.z
     );
-    b_v.setLength(b_length);
+    b_v.setLength( b_length );
     b_v.round();
     var vector_string = b_v.x.toString() + " " + b_v.y.toString() + " " + b_v.z.toString();
 
@@ -412,21 +413,21 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     }
     } else if (materialToUse === "partial"){
         if (twinningCase) {
-          line.layers.set(9); // twinning tet partial lines layer is 9
+          line.layers.set( 9 ); // twinning tet partial lines layer is 9
         } else {
       line.layers.set( 5 ); // direct partial lines layer is 5
       }
     } else {
       if (twinningCase) {
-        line.layers.set(2); // twinning tet edge lines layer is 2
+        line.layers.set( 2 ); // twinning tet edge lines layer is 2
       } else {
-        line.layers.set(1) // direct tet edge lines layer is 1
+        line.layers.set( 1 ) // direct tet edge lines layer is 1
       }
     }
 
     // Add a burgersVector attribute to our line object3D we can reference
-    line.thompsonNotation = ''.concat(pointsPairs[i][0].id, pointsPairs[i][1].id)
-    line.burgersVector = ''.concat(prefactor ," [", vector_string, "]");
+    line.thompsonNotation = ''.concat( pointsPairs[i][0].id, pointsPairs[i][1].id )
+    line.burgersVector = ''.concat( prefactor ," [", vector_string, "]" );
     line.showingText = false;
     line.computeLineDistances();
     if (twinningCase == true) {
@@ -441,16 +442,16 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
 function onDocumentMouseUp( event ){
   /* Timeout one: once we've released the mouse, the box unchecks/checks
   and THEN we can see if it was checked or unchecked. */
-  setTimeout(() => { checkboxManager(); }, 3);
+  setTimeout(() => { checkboxManager(); }, 3 );
   render();
 }
 
 function createCoordinateAxis(){
   //// Everything coordinate axis - related
   // set their material
-  line_materials.push(new THREE.LineBasicMaterial({color: 0xff0000}));
-  line_materials.push(new THREE.LineBasicMaterial({color: 0x00ff00}));
-  line_materials.push(new THREE.LineBasicMaterial({color: 0x0000ff}));
+  line_materials.push( new THREE.LineBasicMaterial( { color: 0xff0000 } ) );
+  line_materials.push( new THREE.LineBasicMaterial( { color: 0x00ff00 } ) );
+  line_materials.push( new THREE.LineBasicMaterial( { color: 0x0000ff } ) );
 
   // create the lines and add to scene
   o = new THREE.Vector3( 0, 0 ,0 );
@@ -459,20 +460,20 @@ function createCoordinateAxis(){
   z = new THREE.Vector3( 0, 0, 1 );
   var radius = 0.01;
   var length = 1;
-  var lx = new THREE.BufferGeometry().setFromPoints([o, x]);
-  var ly = new THREE.BufferGeometry().setFromPoints([o, y]);
-  var lz = new THREE.BufferGeometry().setFromPoints([o, z]);
-  lx_mesh = new THREE.Line(lx, line_materials[0]);
-  ly_mesh = new THREE.Line(ly, line_materials[1]);
-  lz_mesh = new THREE.Line(lz, line_materials[2]);
+  var lx = new THREE.BufferGeometry().setFromPoints( [o, x] );
+  var ly = new THREE.BufferGeometry().setFromPoints( [o, y] );
+  var lz = new THREE.BufferGeometry().setFromPoints( [o, z] );
+  lx_mesh = new THREE.Line( lx, line_materials[0] );
+  ly_mesh = new THREE.Line( ly, line_materials[1] );
+  lz_mesh = new THREE.Line( lz, line_materials[2] );
 
   // add to scene, set layers for visibility / no raycasting conflict.
   coordinates_axis.push( lx_mesh );
   coordinates_axis.push( ly_mesh );
   coordinates_axis.push( lz_mesh );
-  lx_mesh.layers.set(28);
-  ly_mesh.layers.set(28);
-  lz_mesh.layers.set(28);
+  lx_mesh.layers.set( 28 );
+  ly_mesh.layers.set( 28 );
+  lz_mesh.layers.set( 28 );
   scene.add( lx_mesh );
   scene.add( ly_mesh );
   scene.add( lz_mesh );
@@ -484,58 +485,58 @@ function createCoordinateAxis(){
 }
 
 function readBasisCoordinateInput(){
-  x.x = parseInt(document.getElementById( "xx" ).value);
-  x.y = parseInt(document.getElementById( "xy" ).value);
-  x.z = parseInt(document.getElementById( "xz" ).value);
-  y.x = parseInt(document.getElementById( "yx" ).value);
-  y.y = parseInt(document.getElementById( "yy" ).value);
-  y.z = parseInt(document.getElementById( "yz" ).value);
-  z.x = parseInt(document.getElementById( "zx" ).value);
-  z.y = parseInt(document.getElementById( "zy" ).value);
-  z.z = parseInt(document.getElementById( "zz" ).value);
-  x.setLength(3);
-  y.setLength(3);
-  z.setLength(3);
+  x.x = parseInt( document.getElementById( "xx" ).value );
+  x.y = parseInt( document.getElementById( "xy" ).value );
+  x.z = parseInt( document.getElementById( "xz" ).value );
+  y.x = parseInt( document.getElementById( "yx" ).value );
+  y.y = parseInt( document.getElementById( "yy" ).value );
+  y.z = parseInt( document.getElementById( "yz" ).value );
+  z.x = parseInt( document.getElementById( "zx" ).value );
+  z.y = parseInt( document.getElementById( "zy" ).value );
+  z.z = parseInt( document.getElementById( "zz" ).value );
+  x.setLength( 3 );
+  y.setLength( 3 );
+  z.setLength( 3 );
 }
 
 function rotateCoordinateAxis(){
   // Read current desired orientation
   readBasisCoordinateInput();
-  var lx = new THREE.BufferGeometry().setFromPoints([o, x]);
-  var ly = new THREE.BufferGeometry().setFromPoints([o, y]);
-  var lz = new THREE.BufferGeometry().setFromPoints([o, z]);
-  console.log(x);
-  console.log(y);
-  console.log(z);
-  scene.remove(lx_mesh);
-  scene.remove(ly_mesh);
-  scene.remove(lz_mesh);
-  lx_mesh = new THREE.Line(lx, line_materials[0]);
-  ly_mesh = new THREE.Line(ly, line_materials[1]);
-  lz_mesh = new THREE.Line(lz, line_materials[2]);
-  lx_mesh.layers.set(28);
-  ly_mesh.layers.set(28);
-  lz_mesh.layers.set(28);
-  scene.add(lx_mesh);
-  scene.add(ly_mesh);
-  scene.add(lz_mesh);
+  var lx = new THREE.BufferGeometry().setFromPoints( [ o, x ] );
+  var ly = new THREE.BufferGeometry().setFromPoints( [ o, y ] );
+  var lz = new THREE.BufferGeometry().setFromPoints( [ o, z ] );
+  console.log( x );
+  console.log( y );
+  console.log( z );
+  scene.remove( lx_mesh );
+  scene.remove( ly_mesh );
+  scene.remove( lz_mesh );
+  lx_mesh = new THREE.Line( lx, line_materials[0] );
+  ly_mesh = new THREE.Line( ly, line_materials[1] );
+  lz_mesh = new THREE.Line( lz, line_materials[2] );
+  lx_mesh.layers.set( 28 );
+  ly_mesh.layers.set( 28 );
+  lz_mesh.layers.set( 28 );
+  scene.add( lx_mesh );
+  scene.add( ly_mesh );
+  scene.add( lz_mesh );
   render();
 }
 
 function toggleSettings() {
-  var settings = document.getElementById("settings-sub");
-  if (settings.style.display === "none") {
+  var settings = document.getElementById( "settings-sub" );
+  if ( settings.style.display === "none" ) {
     settings.style.display = "block";
-    document.getElementById("settings-toggle-text").innerHTML = "> hide";
-    document.getElementById("settings-toggle").style.right = "75%";
+    document.getElementById( "settings-toggle-text" ).innerHTML = "> hide";
+    document.getElementById( "settings-toggle" ).style.right = "75%";
   } else {
     settings.style.display = "none";
-    document.getElementById("settings-toggle-text").innerHTML = "< show";
-    document.getElementById("settings-toggle").style.right = "-10%";
+    document.getElementById( "settings-toggle-text" ).innerHTML = "< show";
+    document.getElementById( "settings-toggle" ).style.right = "-10%";
   }
 }
 
 function render() {
   renderer.render( scene, camera );
-  labelRenderer.render( scene, camera);
+  labelRenderer.render( scene, camera );
 }
