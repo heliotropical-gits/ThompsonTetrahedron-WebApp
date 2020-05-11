@@ -28,6 +28,7 @@ import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from './three/examples/jsm/renderers/CSS2DRenderer.js';
 
 var container, controls;
+var ocamera, pcamera;
 var camera, scene, renderer, labelRenderer;
 var layers;
 var string_buffer;
@@ -39,6 +40,8 @@ var twinning_checked, twinning_lines_checked, twinning_inner_lines_checked;
 var pointLabels = [];
 var twinningPointLabels = [];
 var lineLabels = [];
+
+var d;
 
 var coordinates_axis = [];
 
@@ -114,7 +117,7 @@ function init() {
   var a = { id: 'α', pos: [ 0.332, 0.667, 0.332] };
   var b = { id: 'β', pos: [ 0.667, 0.332, 0.332] };
   var c = { id: 'γ', pos: [ 0.332, 0.332, 0.667] };
-  var d = { id: '𝛿', pos: [ 0.667, 0.667, 0.667] };
+  d = { id: '𝛿', pos: [ 0.667, 0.667, 0.667] };
   var ap = { id: 'α\'', pos: [ 0.8, 1.123, 0.8 ] };
   var bp = { id: 'β\'', pos: [ 1.123, 0.8, 0.8 ] };
   var cp = { id: 'γ\'', pos: [ 0.8, 0.8, 1.123 ] };
@@ -215,18 +218,23 @@ function init() {
 
   // labels text
   var verticesToLabel = [ A, B, C, D, a, b, c, d ];
-  labelVertices( verticesToLabel, 1 ); // the layer provided here is the layer for the lines: where the pointMesh attaches on click
-  // the layer of the text is implicit, and not actually used for displaying / hiding.
+  labelVertices( verticesToLabel, 13 );
 
   // labels twinning tet
   verticesToLabel = [Dp, ap, bp, cp];
-  labelVertices( verticesToLabel, 2 );
+  labelVertices( verticesToLabel, 14 );
 
   // create a perspective camera (FOV=45deg), set its position arbitrarily
-  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
-  camera.rotation.set(Math.PI / 2, Math.PI / 2, Math.PI / 2);
-  camera.position.set( 2.6, 1.8, 3.8 );
-  camera.layers.enableAll();
+  pcamera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+  pcamera.rotation.set(Math.PI / 2, Math.PI / 2, Math.PI / 2);
+  pcamera.position.set( 2.6, 1.8, 3.8 );
+  pcamera.layers.enableAll();
+
+  ocamera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
+  ocamera.rotation.set(Math.PI / 2, Math.PI / 2, Math.PI / 2);
+  ocamera.layers.enableAll();
+
+  camera = pcamera;
 
   // Raycaster and mouse definitions
   raycaster = new THREE.Raycaster();
@@ -466,6 +474,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     line.thompsonNotation = ''.concat( pointsPairs[i][0].id, pointsPairs[i][1].id )
     line.burgersVector = ''.concat( prefactor ," [", vector_string, "]" );
     line.showingText = false;
+    line.endPoint = v2;
     line.computeLineDistances();
     if (twinningCase == true) {
       t_lines.push( line );
@@ -582,10 +591,24 @@ function toggleSettings() {
 function labelVertices( toLabel, layer ) {
   for (var i = 0; i < toLabel.length; i++ ) {
     var pointPos = vectorFromTetrahedronVertex( toLabel[ i ] );
+    var labelPos, d_vec;
     var pointGeo = new THREE.SphereBufferGeometry( 0.008, 20, 20 );
     var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1.0, transparent: false } );
     var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
+
     pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z);
+
+    switch( layer ) {
+      case 13:
+        d_vec = new THREE.Vector3(0.5336, 0.5336, 0.5336);
+        break;
+      case 14:
+        d_vec = new THREE.Vector3(0.85, 0.85, 0.85);
+        break;
+    }
+    labelPos = new THREE.Vector3( pointPos.x - d_vec.x, pointPos.y - d_vec.y , pointPos.z - d_vec.z ).setLength(0.07)
+    labelPos.y = labelPos.y - 0.06;
+
     var labelDiv = document.createElement( 'div' );
     labelDiv.className = 'text-label';
     labelDiv.classList.add('text');
@@ -597,19 +620,21 @@ function labelVertices( toLabel, layer ) {
     labelDiv.style.marginTop = '-1em';
     labelDiv.style.zIndex = 100;
     labelDiv.style.display = "block";
+
     var label = new CSS2DObject( labelDiv );
-    label.position.set(0.0, 0.004, 0.00);
+    label.position.set(labelPos.x, labelPos.y, labelPos.z);
     label.layers.set( layer );
     //console.log(label);
     //console.log(pointMesh);
     pointMesh.layers.set( layer );
     scene.add( pointMesh );
     pointMesh.add( label );
+
     switch( layer ) {
-    case 1:
+    case 13:
       pointLabels.push( label );
       break;
-    case 2:
+    case 14:
       twinningPointLabels.push( label );
       break;
     default:
@@ -621,13 +646,35 @@ function labelVertices( toLabel, layer ) {
 /* Gets an intersect position and information and creates a text label locally
 containing all Thompson vector information of the intersect */
 function toggleLabelAtIntersect( intersect, layers ) {
+  var d_vec, labelPos;
   if (intersect.object.labelled != true) {
     intersect.object.labelled = true;
+    console.log(intersect);
     var pointPos = intersect.point;
-    var pointGeo = new THREE.SphereBufferGeometry( 0.0001, 20, 20 );
+    var pointGeo = new THREE.ConeBufferGeometry( 0.01, 0.03, 20 );
     var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1, transparent: false } );
     var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
     pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z); // this is where the user clicks on a line
+    pointMesh.up = intersect.object.endPoint;
+    pointMesh.lookAt(intersect.object.endPoint.x, intersect.object.endPoint.y, intersect.object.endPoint.z );
+    pointMesh.rotateX( Math.PI / 2 )
+    //pointMesh.updateMatrix();
+    console.log(pointMesh);
+
+    switch( layers[0] ) {
+      case 1:
+        d_vec = new THREE.Vector3(0.5336, 0.5336, 0.5336);
+        break;
+      case 2:
+        d_vec = new THREE.Vector3(0.85, 0.85, 0.85);
+        break;
+    }
+    labelPos = new THREE.Vector3(
+      pointPos.x + 0.2*(pointPos.x - d_vec.x),
+      pointPos.y + 0.2*(pointPos.y - d_vec.y),
+      pointPos.z + 0.2*(pointPos.z - d_vec.z))
+    labelPos.y = labelPos.y - 0.06;
+
     var labelDiv = document.createElement( 'div' );
     labelDiv.className = 'dynamic-text-label';
     labelDiv.classList.add("text");
@@ -638,12 +685,12 @@ function toggleLabelAtIntersect( intersect, layers ) {
     labelDiv.style.fontWeight = 'bold';
     labelDiv.style.textAlign = 'center';
     var label = new CSS2DObject( labelDiv );
-    label.position.set(0.0, 0.03, 0.00); // where to place label relative to user click position
+    label.position.set(labelPos.x, labelPos.y, labelPos.z); // where to place label relative to user click position
     for (var i = 0; i < length.layers; i++) {
       pointMesh.layers.set( layers[ i ] );
     }
-    intersect.object.add( pointMesh );
-    pointMesh.add( label );
+    intersect.object.attach( pointMesh );
+    pointMesh.attach( label );
     lineLabels.push( pointMesh );
   } else {
     intersect.object.labelled = false;
@@ -697,7 +744,12 @@ function toggleSerifText() {
   render();
 }
 
-function render() {
+function switchCamera() {
+  var button = document.getElementById("camera-switch");
+
+}
+
+function render( ) {
   renderer.render( scene, camera );
   labelRenderer.render( scene, camera );
 }

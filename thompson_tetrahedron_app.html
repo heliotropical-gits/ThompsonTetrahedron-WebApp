@@ -14,7 +14,11 @@
 	</head>
 	<body>
     <script type='module' src='scripts/thompson_tetrahedron_app.js'></script>
-		<noscript>"Your browser does not support javascript, or you've disabled scripts using e.g. NoScript. Please enable scripts to use the Thompson Tetrahedron."</noscript>
+		<noscript>
+			<div class="warning-no-script">
+				"Your browser does not support javascript, or you've disabled scripts using e.g. NoScript. Please enable scripts to use the Thompson Tetrahedron."
+			</div>
+		</noscript>
 		<div class="header monospace">
 		<div id="info">
 			<div class="toggler" id="info-toggle">
@@ -122,6 +126,12 @@
 									</form>
 									<button type="button" id="apply-button">Apply</button>
 								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">View Type</span><br>
+								<button type="button" id="camera-switch">Perspective</button>
 							</div>
 						</li>
 					</ul>
