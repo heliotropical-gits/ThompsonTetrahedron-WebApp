@@ -17,13 +17,17 @@
 		<noscript>"Your browser does not support javascript, or you've disabled scripts using e.g. NoScript. Please enable scripts to use the Thompson Tetrahedron."</noscript>
 		<div class="header monospace">
 		<div id="info">
-			<p>Mouse left click to rotate the view.</p>
-			<p>Mouse right click to translate the view.</p>
+			<div class="toggler" id="info-toggle">
+				<span id="info-toggle-text"> < hide</span>
+			</div>
+			<p>Mouse left click to rotate.</p>
+			<p>Mouse right click to pan.</p>
 			<p>Mouse wheel to zoom / unzoom. </p>
-			<p>Click on any line to display corresponding vector information.</p>
+			<p>Click on any line to display its <br>corresponding vector information.</p>
+			<p>Click the same line to remove it.</p>
 		</div>
 		<div id="settings-outer">
-			<div id="settings-toggle">
+			<div class="toggler" id="settings-toggle">
 				<span id="settings-toggle-text"> > hide</span>
 			</div>
 				<div id="settings-sub">
@@ -62,15 +66,7 @@
 						</li>
 						<li>
 							<div>
-								<span class="property-name">Show Text</span>
-								<div>
-									<input type="checkbox" id="show-text" checked="checked">
-								</div>
-							</div>
-						</li>
-						<li>
-							<div>
-								<span class="property-name">Show Twinning Tetrahedron (TT)</span>
+								<span class="property-name">Show Twinning Tetrahedron (TT) Faces</span>
 								<div>
 									<input type="checkbox" id="show-twinning-tetrahedron">
 								</div>
@@ -89,6 +85,26 @@
 								<span class="property-name">Show TT a/3 Vectors</span>
 								<div>
 									<input type="checkbox" id="show-twinning-tetrahedron-inner-lines">
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Text style: Serif or Sans-Serif</span>
+								<div>
+									<button type="button" id="serif-button">serif</button>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Show Text / TT Text</span>
+								<div>
+									<input type="checkbox" id="show-text" checked="checked">
+									<input type="checkbox" id="show-twinning-text">
+								</div>
+								<div>
+									<button type="button" id="clear-labels-button">clear line labels</button>
 								</div>
 							</div>
 						</li>

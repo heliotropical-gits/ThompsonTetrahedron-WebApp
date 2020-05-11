@@ -9,7 +9,7 @@ html, body {
 body {
   margin: 0%;
   justify-content: center;
-  align-itens: center;
+  align-items: center;
 }
 
 canvas {
@@ -23,6 +23,40 @@ input {
   border-width: 1px;
   border-color: black;
   font-weight: normal;
+}
+
+.text-label {
+  color: #000000;
+  display: block;
+	font-size: 18pt;
+	padding: 2px;
+	background-color: rgba( 1, 1, 1, 0 );
+  z-index: 98 !important;
+  font-color: white;
+  /*text-shadow: 1px 1px 0px black;*/
+  /* color: #ffffff;*/
+  /*text-shadow: 1px 1px 1px white, -1px -1px 1px white, 1px -1px 1px white, -1px 1px 1px white;*/
+	}
+.dynamic-text-label {
+  color: #000000;
+  display: block;
+	font-size: 18pt;
+	padding: 2px;
+	background-color: rgba( 1, 1, 1, 0 );
+  z-index: 98 !important;
+  font-color: white;
+  /*text-shadow: 1px 1px 0px black;*/
+  /* color: #ffffff;*/
+  /*text-shadow: 1px 1px 1px white, -1px -1px 1px white, 1px -1px 1px white, -1px 1px 1px white;*/
+	}
+}
+
+.serif {
+  font-family: "Times New Roman", serif;
+}
+
+.sans{
+   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
 
 input:hover {
@@ -110,12 +144,25 @@ li {
   z-index: 100;
 }
 
-#settings-toggle:hover {
-  background: #000000;
+#info-toggle {
+  position: absolute;
+  background: #cccccc;
+  top: 1vw;
+  left: 85%;
+  width: 2.5em;
+  height: 2.3em;
+  position: absolute;
+  text-align: center;
+  padding: 0.5vw;
+  z-index: 100;
+}
+
+.toggler:hover {
+  background: #000000 !important;
   color: #ffffff;
 }
 
-#settings-toggle:active {
-  background: #0000ff;
+.toggler:active {
+  background: #0000ff !important;
   color: #ffffff;
 }

@@ -36,7 +36,9 @@ var coordinates_checked, text_checked;
 var inner_lines_checked, faces_checked, lines_checked, inner_lines_checked;
 var twinning_checked, twinning_lines_checked, twinning_inner_lines_checked;
 
-var labels = [];
+var pointLabels = [];
+var twinningPointLabels = [];
+var lineLabels = [];
 
 var coordinates_axis = [];
 
@@ -63,7 +65,6 @@ var line_materials = [];
 var rollOverMaterial, rollOverMesh;
 
 var raycaster, mouse;
-var dynamic_text_planes = [];
 
 init();
 render();
@@ -78,6 +79,7 @@ function init() {
   checkbox_hashtable = [
     { html_id: "show-coordinates-axis", checkbox: coordinates_checked, layers: [ 28 ] },
     { html_id: "show-text", checkbox: text_checked, layers: [ 13, 14 ] },
+    { html_id: "show-twinning-text", checkbox: text_checked, layers: [ 13, 14 ] },
     { html_id: "show-faces", checkbox: faces_checked, layers: [ 15 ] },
     { html_id: "show-lines", checkbox: lines_checked, layers: [ 1, 5 ] },
     { html_id: "show-inner-lines", checkbox: inner_lines_checked, layers: [ 6 ] },
@@ -94,6 +96,10 @@ function init() {
   var light1 = new THREE.AmbientLight( 0xffffff );
   light1.layers.set( 32 );
   scene.add( light1 );
+
+  var dirLight = new THREE.DirectionalLight( 0xffffff );
+	dirLight.position.set( 0, 1, 0 );
+	scene.add( dirLight );
 
   //// Create direct tetrahedron -> We define it from scratch from individual faces so we can more easily
   // set its colors and play around with interactivity.
@@ -124,11 +130,11 @@ function init() {
     //var d_vertices = d_corner_vertices.slice(i*9, (i + 1)*9 ) // Picks 9 elements at a time, i.e. 3 points in 3D space
     // use a rolling index for the corner vertices, i.e. after picking [1,2,3], pick [2,3,0]
     d_vertices = [ d_corner_vertices[ i % 4 ].pos, d_corner_vertices[ ( i + 1 ) % 4 ].pos, d_corner_vertices[ ( i + 2 ) % 4 ].pos ];
-    d_vertices_typed = new Float32Array([
+    d_vertices_typed = new Float32Array( [
       d_vertices[0][0], d_vertices[0][1], d_vertices[0][2],
       d_vertices[1][0], d_vertices[1][1], d_vertices[1][2],
       d_vertices[2][0], d_vertices[2][1], d_vertices[2][2],
-    ]);
+    ] );
     d_tet_geometry.setAttribute( 'position', new THREE.BufferAttribute( d_vertices_typed, 3 ) );
     d_material = new THREE.MeshLambertMaterial( { color: d_colors[i] } );
     d_material.transparent = true;
@@ -168,11 +174,11 @@ function init() {
     //var d_vertices = d_corner_vertices.slice(i*9, (i + 1)*9 ) // Picks 9 elements at a time, i.e. 3 points in 3D space
     // use a rolling index for the corner vertices, i.e. after picking [1,2,3], pick [2,3,0]
     t_vertices = [t_corner_vertices[ i % 4 ].pos, t_corner_vertices[ ( i + 1 ) % 4 ].pos, t_corner_vertices[ ( i + 2 ) % 4 ].pos];
-    t_vertices_typed = new Float32Array([
+    t_vertices_typed = new Float32Array( [
       t_vertices[0][0], t_vertices[0][1], t_vertices[0][2],
       t_vertices[1][0], t_vertices[1][1], t_vertices[1][2],
       t_vertices[2][0], t_vertices[2][1], t_vertices[2][2],
-    ]);
+    ] );
     t_tet_geometry.setAttribute( 'position', new THREE.BufferAttribute( t_vertices_typed, 3 ) );
     t_material = new THREE.MeshLambertMaterial( { color: t_colors[i] } );
     t_material.transparent = true;
@@ -202,27 +208,24 @@ function init() {
 
   // Line roll-over helper sphere
   var rollOverGeo = new THREE.SphereBufferGeometry( 0.01, 10, 10 );
-	rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1.0, transparent: false} );
+	rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, opacity: 1.0, transparent: false } );
 	rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
   rollOverMesh.layers.set( 31 ); // rollOverMesh on the same layer as our
 	scene.add( rollOverMesh );
 
-  // labels
-  var verts = [ A, B, C, D, a, b, c, d ]
-  for (var i = 0; i < verts.length; i++ ) {
-    verts[i].labelDiv = document.createElement( 'div' );
-    verts[i].labelDiv.className = 'label';
-    verts[i].labelDiv.textContent = verts.id;
-    verts[i].labelDiv.style.marginTop = '-1em';
-    verts[i].labelObject = new CSS2DObject( verts[i].labelDiv );
-    verts[i].labelObject.position.set( verts[i].pos );
-    labels.push( verts[i].labelObject );
-  }
+  // labels text
+  var verticesToLabel = [ A, B, C, D, a, b, c, d ];
+  labelVertices( verticesToLabel, 1 ); // the layer provided here is the layer for the lines: where the pointMesh attaches on click
+  // the layer of the text is implicit, and not actually used for displaying / hiding.
+
+  // labels twinning tet
+  verticesToLabel = [Dp, ap, bp, cp];
+  labelVertices( verticesToLabel, 2 );
 
   // create a perspective camera (FOV=45deg), set its position arbitrarily
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
   camera.rotation.set(Math.PI / 2, Math.PI / 2, Math.PI / 2);
-  camera.position.set( 2.5, 2.5, 2.5 );
+  camera.position.set( 2.6, 1.8, 3.8 );
   camera.layers.enableAll();
 
   // Raycaster and mouse definitions
@@ -262,7 +265,9 @@ function init() {
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
   document.addEventListener( 'mouseup', onDocumentMouseUp, false );
   document.getElementById( "apply-button" ).addEventListener( 'click', rotateCoordinateAxis, false );
+  document.getElementById( "serif-button" ).addEventListener( 'click', toggleSerifText, false );
   document.getElementById( "settings-toggle" ).addEventListener( 'click', toggleSettings, false );
+  document.getElementById( "clear-labels-button" ).addEventListener( 'click', clearLabels, false );
   window.addEventListener( 'resize', onWindowResize, false );
 
   createCoordinateAxis();
@@ -274,17 +279,53 @@ function init() {
 
 // Check which settings are set.
 function checkboxManager( event ) {
+  var texts;
   for (var i = 0; i < checkbox_hashtable.length; i++) {
     checkbox_hashtable[ i ].checkbox = document.getElementById(checkbox_hashtable[ i ].html_id).checked;
     for (var j = 0; j < checkbox_hashtable[ i ].layers.length; j++){
       if (checkbox_hashtable[ i ].checkbox) {
-        addLayerToViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+        switch(checkbox_hashtable[ i ].html_id) {
+          case "show-text":
+            addTextToView( pointLabels );
+            addLayerToViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+            break;
+          case "show-twinning-text":
+            addTextToView( twinningPointLabels );
+            addLayerToViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+            break;
+          default:
+            addLayerToViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+        }
       } else {
-        removeLayerFromViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+        switch(checkbox_hashtable[ i ].html_id) {
+          case "show-text":
+            removeTextFromView( pointLabels );
+            removeLayerFromViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+            break;
+          case "show-twinning-text":
+            removeTextFromView( twinningPointLabels );
+            removeLayerFromViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+            break;
+          default:
+            removeLayerFromViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
+        }
       }
     }
   }
   render();
+}
+
+function addTextToView( list ) {
+  for (var i = 0; i < list.length; i++) {
+    list[ i ].visible = true;
+
+  }
+}
+
+function removeTextFromView( list ) {
+  for (var i = 0; i < list.length; i++) {
+    list[ i ].visible = false;
+  }
 }
 
 function addLayerToViewAndRaycaster( layer ){
@@ -302,6 +343,7 @@ function onWindowResize( event ) {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
+  labelRenderer.setSize( window.innerWidth, window.innerHeight );
   render();
 }
 
@@ -339,9 +381,12 @@ function onDocumentMouseDown( event ){
     } else {
       var intersect = t_intersects[ 0 ]
     }
-    console.log( intersect );
-    console.log( intersect.object.thompsonNotation );
-    console.log( intersect.object.burgersVector );
+    // at the intersect point, create a new label object.
+    if (intersect == t_intersects[ 0 ]) {
+      toggleLabelAtIntersect( intersect, [ 2, 9 ] )
+    } else {
+      toggleLabelAtIntersect( intersect, [ 1, 5 ] )
+    }
   }
   render();
 }
@@ -380,16 +425,8 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     }
   for ( var i = 0; i < pointsPairs.length; i++ ){
     // Define a pair of points to make a line
-    var v1  = new THREE.Vector3(
-      pointsPairs[i][0].pos[0],
-      pointsPairs[i][0].pos[1],
-      pointsPairs[i][0].pos[2]
-    );
-    var v2 = new THREE.Vector3(
-      pointsPairs[i][1].pos[0],
-      pointsPairs[i][1].pos[1],
-      pointsPairs[i][1].pos[2]
-    );
+    var v1 = vectorFromTetrahedronVertex( pointsPairs[ i ][ 0 ] );
+    var v2 = vectorFromTetrahedronVertex( pointsPairs[ i ][ 1 ] );
     var points = [v1, v2];
 
     // Get the corresponding vector from this pair of points.
@@ -437,6 +474,14 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     }
     scene.add( line );
   };
+}
+
+function vectorFromTetrahedronVertex( vertex ) {
+    return new THREE.Vector3(
+    vertex.pos[ 0 ],
+    vertex.pos[ 1 ],
+    vertex.pos[ 2 ],
+  )
 }
 
 function onDocumentMouseUp( event ){
@@ -505,9 +550,6 @@ function rotateCoordinateAxis(){
   var lx = new THREE.BufferGeometry().setFromPoints( [ o, x ] );
   var ly = new THREE.BufferGeometry().setFromPoints( [ o, y ] );
   var lz = new THREE.BufferGeometry().setFromPoints( [ o, z ] );
-  console.log( x );
-  console.log( y );
-  console.log( z );
   scene.remove( lx_mesh );
   scene.remove( ly_mesh );
   scene.remove( lz_mesh );
@@ -534,6 +576,125 @@ function toggleSettings() {
     document.getElementById( "settings-toggle-text" ).innerHTML = "< show";
     document.getElementById( "settings-toggle" ).style.right = "-10%";
   }
+}
+
+// Puts a label on a list of provided vertices, just done at start up
+function labelVertices( toLabel, layer ) {
+  for (var i = 0; i < toLabel.length; i++ ) {
+    var pointPos = vectorFromTetrahedronVertex( toLabel[ i ] );
+    var pointGeo = new THREE.SphereBufferGeometry( 0.008, 20, 20 );
+    var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1.0, transparent: false } );
+    var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
+    pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z);
+    var labelDiv = document.createElement( 'div' );
+    labelDiv.className = 'text-label';
+    labelDiv.classList.add('text');
+    // take care of special case of twinning tet labels special case
+    if ( toLabel[ i ].id.includes('p') ){
+      labelDiv.classList.add('text-twinning');
+    }
+    labelDiv.textContent = toLabel[i].id
+    labelDiv.style.marginTop = '-1em';
+    labelDiv.style.zIndex = 100;
+    labelDiv.style.display = "block";
+    var label = new CSS2DObject( labelDiv );
+    label.position.set(0.0, 0.004, 0.00);
+    label.layers.set( layer );
+    //console.log(label);
+    //console.log(pointMesh);
+    pointMesh.layers.set( layer );
+    scene.add( pointMesh );
+    pointMesh.add( label );
+    switch( layer ) {
+    case 1:
+      pointLabels.push( label );
+      break;
+    case 2:
+      twinningPointLabels.push( label );
+      break;
+    default:
+      console.log("WARNING: invalid layer in vertex label creation, defaulting to pushing direct tetrahedron vertices labels array.")
+    }
+  }
+}
+
+/* Gets an intersect position and information and creates a text label locally
+containing all Thompson vector information of the intersect */
+function toggleLabelAtIntersect( intersect, layers ) {
+  if (intersect.object.labelled != true) {
+    intersect.object.labelled = true;
+    var pointPos = intersect.point;
+    var pointGeo = new THREE.SphereBufferGeometry( 0.0001, 20, 20 );
+    var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1, transparent: false } );
+    var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
+    pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z); // this is where the user clicks on a line
+    var labelDiv = document.createElement( 'div' );
+    labelDiv.className = 'dynamic-text-label';
+    labelDiv.classList.add("text");
+    labelDiv.innerHTML = intersect.object.thompsonNotation +
+      "<br>" + intersect.object.burgersVector
+    labelDiv.style.marginTop = '-1em';
+    labelDiv.style.zIndex = 100;
+    labelDiv.style.fontWeight = 'bold';
+    labelDiv.style.textAlign = 'center';
+    var label = new CSS2DObject( labelDiv );
+    label.position.set(0.0, 0.03, 0.00); // where to place label relative to user click position
+    for (var i = 0; i < length.layers; i++) {
+      pointMesh.layers.set( layers[ i ] );
+    }
+    intersect.object.add( pointMesh );
+    pointMesh.add( label );
+    lineLabels.push( pointMesh );
+  } else {
+    intersect.object.labelled = false;
+    for (var i = 0; i < intersect.object.children.length; i++ ){
+      intersect.object.children[ i ].remove(intersect.object.children[ i ].children[ 0 ] );
+      intersect.object.remove(intersect.object.children[ i ])
+    }
+  }
+  render();
+}
+
+function clearLabels( ) {
+  for (var i = 0; i < lineLabels.length; i++){
+    scene.remove( lineLabels[ i ] )
+  }
+  lineLabels = [];
+  for (var i = 0; i < lines.length; i++){
+    lines[ i ].remove(lines[ i ].children[ 0 ])
+    lines[ i ].labelled = false;
+  }
+  for (var i = 0; i < t_lines.length; i++){
+    t_lines[ i ].remove(t_lines[ i ].children[ 0 ])
+    t_lines[ i ].labelled = false;
+  }
+  var labels = document.getElementsByClassName( "dynamic-text-label" );
+  for (var i = labels.length -1; i >= 0; i--){
+    labels[i].remove();
+  }
+
+  render();
+}
+
+function toggleSerifText() {
+  var newLabel, classToRemove, classToAdd;
+  var button = document.getElementById("serif-button");
+  var texts = document.getElementsByClassName("text");
+  if (button.innerHTML === "serif") {
+    newLabel = "sans";
+    classToRemove = "serif";
+    classToAdd = "sans";
+  } else {
+    newLabel = "serif";
+    classToRemove = "sans";
+    classToAdd = "serif";
+  }
+  for ( var i = 0; i < texts.length; i++ ){
+    texts[ i ].classList.add(classToAdd);
+    texts[ i ].classList.remove(classToRemove);
+    button.innerHTML = newLabel;
+  }
+  render();
 }
 
 function render() {
