@@ -27,7 +27,7 @@ import * as THREE from './three/build/three.module.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from './three/examples/jsm/renderers/CSS2DRenderer.js';
 
-var container, controls;
+var container, pcontrols, ocontrols, controls;
 var ocamera, pcamera;
 var camera, scene, renderer, labelRenderer;
 var layers;
@@ -37,6 +37,9 @@ var coordinates_checked, text_checked;
 var inner_lines_checked, faces_checked, lines_checked, inner_lines_checked;
 var twinning_checked, twinning_lines_checked, twinning_inner_lines_checked;
 
+var mouseDownDate, mouseUpDate;
+
+var planeLabels = [];
 var pointLabels = [];
 var twinningPointLabels = [];
 var lineLabels = [];
@@ -81,8 +84,9 @@ function init() {
   // BOOKMARK: Layers Definitions
   checkbox_hashtable = [
     { html_id: "show-coordinates-axis", checkbox: coordinates_checked, layers: [ 28 ] },
-    { html_id: "show-text", checkbox: text_checked, layers: [ 13, 14 ] },
-    { html_id: "show-twinning-text", checkbox: text_checked, layers: [ 13, 14 ] },
+    { html_id: "show-text", checkbox: text_checked, layers: [ 13 ] },
+    { html_id: "show-plane-info", checkbox: text_checked, layers: [ 25 ] },
+    { html_id: "show-twinning-text", checkbox: text_checked, layers: [ 14 ] },
     { html_id: "show-faces", checkbox: faces_checked, layers: [ 15 ] },
     { html_id: "show-lines", checkbox: lines_checked, layers: [ 1, 5 ] },
     { html_id: "show-inner-lines", checkbox: inner_lines_checked, layers: [ 6 ] },
@@ -114,10 +118,10 @@ function init() {
   var C = { id: 'C', pos: [ 1.0, 1.0, 0.0 ] };
   var D = { id: 'D', pos: [ 0.0, 0.0, 0.0 ] };
   var Dp = { id: 'D\'', pos: [ 1.334, 1.334, 1.334 ] }; // D prime, the (evil) twin mirror of D.
-  var a = { id: 'α', pos: [ 0.332, 0.667, 0.332] };
-  var b = { id: 'β', pos: [ 0.667, 0.332, 0.332] };
-  var c = { id: 'γ', pos: [ 0.332, 0.332, 0.667] };
-  d = { id: '𝛿', pos: [ 0.667, 0.667, 0.667] };
+  var a = { id: 'α', pos: [ 0.332, 0.667, 0.332], planeInfo: "(a)(1 -1 1)"};
+  var b = { id: 'β', pos: [ 0.667, 0.332, 0.332], planeInfo: "(b)(-1 1 1)" };
+  var c = { id: 'γ', pos: [ 0.332, 0.332, 0.667], planeInfo: "(c)(1 1 -1)" };
+  d = { id: '𝛿', pos: [ 0.667, 0.667, 0.667], planeInfo: "(d)(1 1 1)" };
   var ap = { id: 'α\'', pos: [ 0.8, 1.123, 0.8 ] };
   var bp = { id: 'β\'', pos: [ 1.123, 0.8, 0.8 ] };
   var cp = { id: 'γ\'', pos: [ 0.8, 0.8, 1.123 ] };
@@ -229,10 +233,14 @@ function init() {
   pcamera.rotation.set(Math.PI / 2, Math.PI / 2, Math.PI / 2);
   pcamera.position.set( 2.6, 1.8, 3.8 );
   pcamera.layers.enableAll();
+  pcamera.updateProjectionMatrix();
 
-  ocamera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
+  ocamera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 0.1, 300 );
   ocamera.rotation.set(Math.PI / 2, Math.PI / 2, Math.PI / 2);
+  var i_pos = new THREE.Vector3(2.6, 1.8, 3.8).setLength(2)
+  ocamera.position.set( i_pos.x, i_pos.y, i_pos.z );
   ocamera.layers.enableAll();
+  ocamera.updateProjectionMatrix();
 
   camera = pcamera;
 
@@ -261,13 +269,23 @@ function init() {
 	document.body.appendChild( labelRenderer.domElement );
 
   // Camera controls and initial orientation setup
-  controls = new OrbitControls( camera, renderer.domElement );
-  controls.addEventListener( 'change', render );
-  controls.minDistance = 2.5;
-  controls.maxDistance = 5;
-  controls.target.set( 0.5, 0.5, 0.5 );
-  controls.screenSpacePanning = true;
-  controls.update();
+  pcontrols = new OrbitControls( pcamera, renderer.domElement );
+  pcontrols.addEventListener( 'change', render );
+  pcontrols.minDistance = 2.5;
+  pcontrols.maxDistance = 5;
+  pcontrols.target.set( 0.5, 0.5, 0.5 );
+  pcontrols.screenSpacePanning = true;
+  pcontrols.update();
+
+  ocontrols = new OrbitControls( ocamera, renderer.domElement );
+  ocontrols.addEventListener( 'change', render );
+  ocontrols.minDistance = 2.5;
+  ocontrols.maxDistance = 5;
+  ocontrols.zoom = 300;
+  ocontrols.minZoom = 250;
+  ocontrols.target.set( 0.5, 0.5, 0.5 );
+  ocontrols.screenSpacePanning = true;
+  ocontrols.update();
 
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -275,12 +293,17 @@ function init() {
   document.getElementById( "apply-button" ).addEventListener( 'click', rotateCoordinateAxis, false );
   document.getElementById( "serif-button" ).addEventListener( 'click', toggleSerifText, false );
   document.getElementById( "settings-toggle" ).addEventListener( 'click', toggleSettings, false );
+  document.getElementById( "info-toggle" ).addEventListener( 'click', toggleInfo, false );
+  document.getElementById( "camera-switch" ).addEventListener( 'click', switchCamera, false );
   document.getElementById( "clear-labels-button" ).addEventListener( 'click', clearLabels, false );
   window.addEventListener( 'resize', onWindowResize, false );
 
   createCoordinateAxis();
   checkboxManager();
-
+  var size = 10;
+  var divisions = 10;
+  
+  console.log(scene);
 }
 
 ////////////////////// SUPPORTING FUNCTIONS AND PROCEDURES
@@ -293,6 +316,9 @@ function checkboxManager( event ) {
     for (var j = 0; j < checkbox_hashtable[ i ].layers.length; j++){
       if (checkbox_hashtable[ i ].checkbox) {
         switch(checkbox_hashtable[ i ].html_id) {
+          case "show-plane-info":
+            addTextToView( planeLabels );
+            break;
           case "show-text":
             addTextToView( pointLabels );
             addLayerToViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
@@ -306,6 +332,9 @@ function checkboxManager( event ) {
         }
       } else {
         switch(checkbox_hashtable[ i ].html_id) {
+          case "show-plane-info":
+            removeTextFromView( planeLabels );
+            break;
           case "show-text":
             removeTextFromView( pointLabels );
             removeLayerFromViewAndRaycaster(checkbox_hashtable[ i ].layers[ j ]);
@@ -326,7 +355,6 @@ function checkboxManager( event ) {
 function addTextToView( list ) {
   for (var i = 0; i < list.length; i++) {
     list[ i ].visible = true;
-
   }
 }
 
@@ -348,8 +376,14 @@ function removeLayerFromViewAndRaycaster( layer ){
 
 // resize the camera aspect ratio accordingly if window resized
 function onWindowResize( event ) {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+  pcamera.aspect = window.innerWidth / window.innerHeight;
+  ocamera.left = window.innerWidth / -2;
+  ocamera.right = window.innerWidth / 2;
+  ocamera.top = window.innerHeight / 2;
+  ocamera.bottom = window.innerHeight / -2;
+
+  ocamera.updateProjectionMatrix();
+  pcamera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
   labelRenderer.setSize( window.innerWidth, window.innerHeight );
   render();
@@ -380,22 +414,36 @@ function onDocumentMouseMove( event ) {
 // Check for mouse movement and intersection with object.
 // Interact with first object from camera that's intersected with mouse.
 function onDocumentMouseDown( event ){
-  raycaster.setFromCamera( mouse, camera );
-  var intersects = raycaster.intersectObjects( lines, true );
-  var t_intersects = raycaster.intersectObjects( t_lines, true );
-  if ( intersects.length > 0 || t_intersects.length > 0 ){
-    if ( intersects.length > 0 ) {
-      var intersect = intersects[ 0 ];
-    } else {
-      var intersect = t_intersects[ 0 ]
-    }
-    // at the intersect point, create a new label object.
-    if (intersect == t_intersects[ 0 ]) {
-      toggleLabelAtIntersect( intersect, [ 2, 9 ] )
-    } else {
-      toggleLabelAtIntersect( intersect, [ 1, 5 ] )
+  mouseDownDate = Date.now();
+  render();
+}
+
+
+function onDocumentMouseUp( event ){
+  // Added date comparison to ensure we don't set labels while rotating
+  mouseUpDate = Date.now();
+  if (mouseUpDate - mouseDownDate < 200 ) {
+    raycaster.setFromCamera( mouse, camera );
+    var intersects = raycaster.intersectObjects( lines, true );
+    var t_intersects = raycaster.intersectObjects( t_lines, true );
+    if ( intersects.length > 0 || t_intersects.length > 0 ){
+      if ( intersects.length > 0 ) {
+        var intersect = intersects[ 0 ];
+      } else {
+        var intersect = t_intersects[ 0 ]
+      }
+      // at the intersect point, create a new label object.
+      if (intersect == t_intersects[ 0 ]) {
+        toggleLabelAtIntersect( intersect, [ 2, 9 ] )
+      } else {
+        toggleLabelAtIntersect( intersect, [ 1, 5 ] )
+      }
     }
   }
+
+  /* Timeout one: once we've released the mouse, the box unchecks/checks
+  and THEN we can see if it was checked or unchecked. */
+  setTimeout(() => { checkboxManager(); }, 3 );
   render();
 }
 
@@ -407,6 +455,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
       color: 0x000000,
       linewidth: 2
     } );
+    material.lineType =  "full"
     prefactor = "a/2";
   } else if (materialToUse === "partial") {
     b_length = 2.449489742783178;
@@ -416,6 +465,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
   	  dashSize: 3,
   	  gapSize: 1
     } );
+    material.lineType = "partial"
     prefactor = "a/6";
   }
     else if ( materialToUse === "inner" ) {
@@ -426,6 +476,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     	  dashSize: 3,
     	  gapSize: 1
       } );
+      material.lineType = "inner"
       prefactor = "a/3";
     }
     if ( materialToUse === "inner" && twinningCase ) {
@@ -443,8 +494,14 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
       v2.y - v1.y,
       v2.z - v1.z
     );
-    b_v.setLength( b_length );
-    b_v.round();
+
+    if (twinningCase) {
+
+    } else {
+      b_v.setLength( b_length );
+      b_v.round();
+    }
+
     var vector_string = b_v.x.toString() + " " + b_v.y.toString() + " " + b_v.z.toString();
 
     // create the line
@@ -475,6 +532,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     line.burgersVector = ''.concat( prefactor ," [", vector_string, "]" );
     line.showingText = false;
     line.endPoint = v2;
+    line.isOfTwin = twinningCase;
     line.computeLineDistances();
     if (twinningCase == true) {
       t_lines.push( line );
@@ -491,13 +549,6 @@ function vectorFromTetrahedronVertex( vertex ) {
     vertex.pos[ 1 ],
     vertex.pos[ 2 ],
   )
-}
-
-function onDocumentMouseUp( event ){
-  /* Timeout one: once we've released the mouse, the box unchecks/checks
-  and THEN we can see if it was checked or unchecked. */
-  setTimeout(() => { checkboxManager(); }, 3 );
-  render();
 }
 
 function createCoordinateAxis(){
@@ -571,6 +622,13 @@ function rotateCoordinateAxis(){
   scene.add( lx_mesh );
   scene.add( ly_mesh );
   scene.add( lz_mesh );
+  /*
+  ocamera.up = new THREE.Vector3(y.x, y.y, y.z)
+  ocontrols.up = new THREE.Vector3(y.x, y.y, y.z)
+  ocontrols.target.set(0.5, 0.5, 0.5);
+  ocamera.updateProjectionMatrix();
+  //pcamera.up.set()
+  */
   render();
 }
 
@@ -587,6 +645,19 @@ function toggleSettings() {
   }
 }
 
+function toggleInfo() {
+  var settings = document.getElementById( "info-inner" );
+  if ( settings.style.display === "none" ) {
+    settings.style.display = "block";
+    document.getElementById( "info-toggle-text" ).innerHTML = "< hide";
+    document.getElementById( "info-toggle" ).style.right = "75%";
+  } else {
+    settings.style.display = "none";
+    document.getElementById( "info-toggle-text" ).innerHTML = "> show";
+    document.getElementById( "info-toggle" ).style.right = "-10%";
+  }
+}
+
 // Puts a label on a list of provided vertices, just done at start up
 function labelVertices( toLabel, layer ) {
   for (var i = 0; i < toLabel.length; i++ ) {
@@ -595,8 +666,7 @@ function labelVertices( toLabel, layer ) {
     var pointGeo = new THREE.SphereBufferGeometry( 0.008, 20, 20 );
     var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1.0, transparent: false } );
     var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
-
-    pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z);
+    pointMesh.position.set( pointPos.x , pointPos.y, pointPos.z);
 
     switch( layer ) {
       case 13:
@@ -616,18 +686,44 @@ function labelVertices( toLabel, layer ) {
     if ( toLabel[ i ].id.includes('p') ){
       labelDiv.classList.add('text-twinning');
     }
-    labelDiv.textContent = toLabel[i].id
+
+    labelDiv.textContent = toLabel[ i ].id;
+    labelDiv.style.textAlign = 'center';
     labelDiv.style.marginTop = '-1em';
-    labelDiv.style.zIndex = 100;
+    labelDiv.style.zIndex = 95;
     labelDiv.style.display = "block";
+
+
 
     var label = new CSS2DObject( labelDiv );
     label.position.set(labelPos.x, labelPos.y, labelPos.z);
     label.layers.set( layer );
-    //console.log(label);
-    //console.log(pointMesh);
     pointMesh.layers.set( layer );
     scene.add( pointMesh );
+
+    // Make another label for plane info
+    // in 4 specific cases
+    if (
+      toLabel[ i ].id == 'α' ||
+      toLabel[ i ].id == 'β' ||
+      toLabel[ i ].id == 'γ' ||
+      toLabel[ i ].id == '𝛿'
+    ){
+      var planeLabelDiv = document.createElement( 'div' );
+      planeLabelDiv.className = 'text-label';
+      planeLabelDiv.classList.add('text');
+      planeLabelDiv.textContent = toLabel[ i ].planeInfo;
+      planeLabelDiv.style.textAlign = 'center';
+      planeLabelDiv.style.marginTop = '-1em';
+      planeLabelDiv.style.zIndex = 95;
+      planeLabelDiv.style.display = "block";
+      var planeLabel = new CSS2DObject( planeLabelDiv );
+      planeLabel.position.set(labelPos.x, labelPos.y + 0.08, labelPos.z);
+      planeLabel.layers.set( 25 ); //TODO removeMagicNumber();
+      pointMesh.add( planeLabel );
+      planeLabels.push( planeLabel );
+    }
+
     pointMesh.add( label );
 
     switch( layer ) {
@@ -646,21 +742,10 @@ function labelVertices( toLabel, layer ) {
 /* Gets an intersect position and information and creates a text label locally
 containing all Thompson vector information of the intersect */
 function toggleLabelAtIntersect( intersect, layers ) {
-  var d_vec, labelPos;
+  var d_vec, labelPos, s;
   if (intersect.object.labelled != true) {
     intersect.object.labelled = true;
-    console.log(intersect);
     var pointPos = intersect.point;
-    var pointGeo = new THREE.ConeBufferGeometry( 0.01, 0.03, 20 );
-    var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1, transparent: false } );
-    var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
-    pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z); // this is where the user clicks on a line
-    pointMesh.up = intersect.object.endPoint;
-    pointMesh.lookAt(intersect.object.endPoint.x, intersect.object.endPoint.y, intersect.object.endPoint.z );
-    pointMesh.rotateX( Math.PI / 2 )
-    //pointMesh.updateMatrix();
-    console.log(pointMesh);
-
     switch( layers[0] ) {
       case 1:
         d_vec = new THREE.Vector3(0.5336, 0.5336, 0.5336);
@@ -669,25 +754,57 @@ function toggleLabelAtIntersect( intersect, layers ) {
         d_vec = new THREE.Vector3(0.85, 0.85, 0.85);
         break;
     }
+    var pointGeo = new THREE.ConeGeometry( 0.02, 0.05, 3 );
+    var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1, transparent: false } );
+    var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
+    pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z); // this is where the user clicks on a line
+    pointMesh.up = intersect.object.endPoint;
+    pointMesh.lookAt(intersect.object.endPoint.x, intersect.object.endPoint.y, intersect.object.endPoint.z );
+    pointMesh.rotateX( Math.PI / 2 )
+    pointMesh.position.set( pointPos.x, pointPos.y , pointPos.z );
+
+
+
+    switch( intersect.object.material.lineType ){
+      case "full":
+        s = 0.2;
+        break;
+      case "partial":
+        s = 0.4;
+        break;
+      case "inner":
+        s = 0.6;
+        break;
+    }
+
+
     labelPos = new THREE.Vector3(
-      pointPos.x + 0.2*(pointPos.x - d_vec.x),
-      pointPos.y + 0.2*(pointPos.y - d_vec.y),
-      pointPos.z + 0.2*(pointPos.z - d_vec.z))
+    pointPos.x + s*(pointPos.x - d_vec.x),
+    pointPos.y + s*(pointPos.y - d_vec.y),
+    pointPos.z + s*(pointPos.z - d_vec.z))
     labelPos.y = labelPos.y - 0.06;
 
     var labelDiv = document.createElement( 'div' );
     labelDiv.className = 'dynamic-text-label';
     labelDiv.classList.add("text");
-    labelDiv.innerHTML = intersect.object.thompsonNotation +
-      "<br>" + intersect.object.burgersVector
+    if (intersect.object.isOfTwin) {
+      labelDiv.innerHTML = intersect.object.thompsonNotation
+    } else {
+      labelDiv.innerHTML = intersect.object.thompsonNotation +
+        "<br>" + intersect.object.burgersVector
+    }
+
     labelDiv.style.marginTop = '-1em';
     labelDiv.style.zIndex = 100;
     labelDiv.style.fontWeight = 'bold';
     labelDiv.style.textAlign = 'center';
     var label = new CSS2DObject( labelDiv );
     label.position.set(labelPos.x, labelPos.y, labelPos.z); // where to place label relative to user click position
+
+    //label.layers.disableAll()
+    //pointMesh.layers.disableAll();
     for (var i = 0; i < length.layers; i++) {
-      pointMesh.layers.set( layers[ i ] );
+      pointMesh.layers.enable( layers[ i ] );
     }
     intersect.object.attach( pointMesh );
     pointMesh.attach( label );
@@ -746,7 +863,17 @@ function toggleSerifText() {
 
 function switchCamera() {
   var button = document.getElementById("camera-switch");
-
+  switch(button.innerHTML) {
+    case "Perspective":
+      button.innerHTML = "Orthographic";
+      camera = ocamera;
+      break;
+    case "Orthographic":
+      button.innerHTML = "Perspective";
+      camera = pcamera;
+      break;
+  }
+  render();
 }
 
 function render( ) {

@@ -113,6 +113,10 @@ li {
 	text-align: left;
 	z-index: 98;
 	display:block;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
 }
 
 #settings-outer {
@@ -159,7 +163,7 @@ li {
   position: absolute;
   background: #cccccc;
   top: 1vw;
-  left: 85%;
+  left: 95%;
   width: 2.5em;
   height: 2.3em;
   position: absolute;

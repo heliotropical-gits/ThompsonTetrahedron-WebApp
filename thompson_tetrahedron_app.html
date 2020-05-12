@@ -24,11 +24,14 @@
 			<div class="toggler" id="info-toggle">
 				<span id="info-toggle-text"> < hide</span>
 			</div>
-			<p>Mouse left click to rotate.</p>
-			<p>Mouse right click to pan.</p>
-			<p>Mouse wheel to zoom / unzoom. </p>
-			<p>Click on any line to display its <br>corresponding vector information.</p>
-			<p>Click the same line to remove it.</p>
+			<div id="info-inner">
+				<p>Mouse left click to rotate.</p>
+				<p>Mouse right click to pan.</p>
+				<p>Mouse wheel to zoom / unzoom. </p>
+				<p>Click on any line to display its <br>corresponding vector information.</p>
+				<p>Click the same line to remove it.</p>
+				<p>Twinned Burgers' Vectors are only <br> provided in Thompson Notation.<br>Assume (d) = (111) as mirror plane.</p>
+			</div>
 		</div>
 		<div id="settings-outer">
 			<div class="toggler" id="settings-toggle">
@@ -102,13 +105,21 @@
 						</li>
 						<li>
 							<div>
-								<span class="property-name">Show Text / TT Text</span>
+								<span class="property-name">Show Point Labels / TT Labels </span>
 								<div>
 									<input type="checkbox" id="show-text" checked="checked">
 									<input type="checkbox" id="show-twinning-text">
 								</div>
 								<div>
-									<button type="button" id="clear-labels-button">clear line labels</button>
+									<button type="button" id="clear-labels-button">clear vector labels</button>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Show Plane Info</span>
+								<div>
+									<input type="checkbox" id="show-plane-info" >
 								</div>
 							</div>
 						</li>
