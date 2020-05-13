@@ -17,7 +17,8 @@ For effectively everything, the three.js library was used [3], which is licensed
 
 ##### References
 
-[1] Hirth, John Price, Jens Lothe, and T. Mura. "Theory of dislocations." (1983): 476-477.
-[2] [GPL-v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[3] [three.js library](https://github.com/mrdoob/three.js)
-[4] [MIT License](https://en.wikipedia.org/wiki/MIT_License)
+[1] Hirth, John Price, Jens Lothe, and T. Mura. "Theory of dislocations." (1983): 476-477.  
+[2] [GPL-v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)  
+[3] [three.js library](https://github.com/mrdoob/three.js)  
+[4] [MIT License](https://en.wikipedia.org/wiki/MIT_License)  
+
