@@ -1,6 +1,6 @@
 # Thompson Tetrahedron Web App
 
-This app builds and displays an interactive Thompson Tetrahedron you can use for studying / as a reference for [slip systems](https://en.wikipedia.org/wiki/Slip_(materials_science)#Slip_systems) on which [dislocations](https://en.wikipedia.org/wiki/Dislocation) can easily glide during [plastic deformation](https://en.wikipedia.org/wiki/Plasticity_(physics)) in [face centered cubic (FCC) crystals](https://en.wikipedia.org/wiki/Cubic_crystal_system).
+This app builds and displays an interactive [Thompson Tetrahedron](https://www.tf.uni-kiel.de/matwis/amat/def_en/kap_5/backbone/r5_4_2.pdf) you can use for studying / as a reference for [slip systems](https://en.wikipedia.org/wiki/Slip_(materials_science)#Slip_systems) on which [dislocations](https://en.wikipedia.org/wiki/Dislocation) can easily glide during [plastic deformation](https://en.wikipedia.org/wiki/Plasticity_(physics)) in [face centered cubic (FCC) crystals](https://en.wikipedia.org/wiki/Cubic_crystal_system).
 
 Interactivity includes:
 * Displaying specific slip system info on click
