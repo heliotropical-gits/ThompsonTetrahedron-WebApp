@@ -15,10 +15,22 @@ In the web app, both notations are provided, giving a handy reference to convert
 Built using HTML/CSS and javascript, and licensed under GPL-v3.0-or-later [2].
 For effectively everything, the three.js library was used [3], which is licensed under the MIT License [4].
 
+
+### Hosting the app
+
+Hosting the app simply requires you to clone / download all the files provided in the git and link to the **.html** file from somewhere else.
+
+
+### Note about testing the app on your machine
+
+As a security measure, all assets on a page need to have the same source for your browser to open it.  
+This means that if you just download everything here and open the **.html** page locally with your browser, it won't work.
+If you want to play around with the app locally and without an internet connection, you can use local server tools like e.g. [http-server](https://www.npmjs.com/package/http-server) or [browser-sync](https://www.browsersync.io/#install). Both these examples require a local installation of [node.js](https://nodejs.org)
+
+
 ##### References
 
 [1] Hirth, John Price, Jens Lothe, and T. Mura. "Theory of dislocations." (1983): 476-477.  
 [2] [GPL-v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)  
 [3] [three.js library](https://github.com/mrdoob/three.js)  
 [4] [MIT License](https://en.wikipedia.org/wiki/MIT_License)  
-
