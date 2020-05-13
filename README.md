@@ -18,7 +18,7 @@ For effectively everything, the three.js library was used [3], which is licensed
 
 ### Hosting the app
 
-Hosting the app simply requires you to clone / download all the files provided in the git and link to the **.html** file from somewhere else.
+Hosting the app simply requires you to clone / download all the files provided in the git onto your webserver and link to the **.html** file from somewhere else.
 
 
 ### Note about testing the app on your machine
