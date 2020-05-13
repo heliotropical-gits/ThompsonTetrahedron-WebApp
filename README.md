@@ -6,7 +6,7 @@ Interactivity includes:
 * Displaying specific slip system info on click
 * Coordinate axis rotation 
 * Hiding and displaying specific features 
-* Displaying a [twinning](https://en.wikipedia.org/wiki/Crystal_twinning) (mirrored) Thompson Tetrahedron, assuming (d) = (111) as the twinning plane.
+* Displaying a [twinning](https://en.wikipedia.org/wiki/Crystal_twinning) (mirrored) Thompson Tetrahedron, assuming (d) = (111) as the twinning plane
 * Choice of perspective or orthographic view
 
 Slip systems, dislocations splitting and reactions between several dislocations can be handily described using the Thompson notation detailed in ref. [1], which transforms large, sometimes unwieldy Miller index notation for dislocations into something akin to linear algebra.
