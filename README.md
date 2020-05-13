@@ -28,7 +28,7 @@ This means that if you just download everything here and open the **.html** page
 If you want to play around with the app locally and without an internet connection, you can use local server tools like e.g. [http-server](https://www.npmjs.com/package/http-server) or [browser-sync](https://www.browsersync.io/#install). Both these examples require a local installation of [node.js](https://nodejs.org)
 
 
-##### References
+### References
 
 [1] Hirth, John Price, Jens Lothe, and T. Mura. "Theory of dislocations." (1983): 476-477.  
 [2] [GPL-v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)  
