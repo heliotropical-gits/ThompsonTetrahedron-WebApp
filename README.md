@@ -12,7 +12,7 @@ Interactivity includes:
 Slip systems, dislocations splitting and reactions between several dislocations can be handily described using the Thompson notation detailed in ref. [1], which transforms large, sometimes unwieldy [Miller index](https://en.wikipedia.org/wiki/Miller_index) notation for dislocations into something akin to linear algebra.
 In the web app, both notations are provided, giving a handy reference to convert from one to the other, and get an orientable view of e.g. the slip systems involved in a dislocation reaction you might be interested in.
 
-Built using HTML/CSS and javascript, and licensed under GPL-v3.0-or-later [2].
+Built using HTML/CSS and javascript, and licensed under GPL-v3.0-or-later [2].  
 For effectively everything, the three.js library was used [3], which is licensed under the MIT License [4].
 
 
