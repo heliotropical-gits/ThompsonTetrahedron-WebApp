@@ -302,7 +302,7 @@ function init() {
   checkboxManager();
   var size = 10;
   var divisions = 10;
-  
+
   console.log(scene);
 }
 
@@ -622,13 +622,20 @@ function rotateCoordinateAxis(){
   scene.add( lx_mesh );
   scene.add( ly_mesh );
   scene.add( lz_mesh );
-  /*
+
   ocamera.up = new THREE.Vector3(y.x, y.y, y.z)
   ocontrols.up = new THREE.Vector3(y.x, y.y, y.z)
   ocontrols.target.set(0.5, 0.5, 0.5);
+  pcamera.up = new THREE.Vector3(y.x, y.y, y.z)
+  pcontrols.up = new THREE.Vector3(y.x, y.y, y.z)
+  pcontrols.target.set(0.5, 0.5, 0.5);
+  scene.up = new THREE.Vector3(y.x, y.y, y.z)
+
   ocamera.updateProjectionMatrix();
-  //pcamera.up.set()
-  */
+  pcamera.updateProjectionMatrix();
+
+
+  scene
   render();
 }
 
