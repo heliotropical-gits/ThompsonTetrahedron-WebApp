@@ -503,6 +503,7 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
     }
 
     var vector_string = b_v.x.toString() + " " + b_v.y.toString() + " " + b_v.z.toString();
+    var neg_vector_string = -b_v.x.toString() + " " + -b_v.y.toString() + " " + -b_v.z.toString();
 
     // create the line
     var line_geometry = new THREE.BufferGeometry().setFromPoints( points );
@@ -529,8 +530,11 @@ function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
 
     // Add a burgersVector attribute to our line object3D we can reference
     line.thompsonNotation = ''.concat( pointsPairs[i][0].id, pointsPairs[i][1].id )
+    line.negThompsonNotation = ''.concat( pointsPairs[i][1].id, pointsPairs[i][0].id )
     line.burgersVector = ''.concat( prefactor ," [", vector_string, "]" );
+    line.negBurgersVector = ''.concat( prefactor ," [", neg_vector_string, "]" );
     line.showingText = false;
+    line.startPoint = v1;
     line.endPoint = v2;
     line.isOfTwin = twinningCase;
     line.computeLineDistances();
@@ -750,7 +754,7 @@ function labelVertices( toLabel, layer ) {
 containing all Thompson vector information of the intersect */
 function toggleLabelAtIntersect( intersect, layers ) {
   var d_vec, labelPos, s;
-  if (intersect.object.labelled != true) {
+  if (intersect.object.labelled != 1 && intersect.object.labelled != 2) { // 1 is one way, 2 is the other way, 0 is not-labelled.
     intersect.object.labelled = true;
     var pointPos = intersect.point;
     switch( layers[0] ) {
@@ -793,6 +797,7 @@ function toggleLabelAtIntersect( intersect, layers ) {
 
     var labelDiv = document.createElement( 'div' );
     labelDiv.className = 'dynamic-text-label';
+    labelDiv.idName = intersect.object.thompsonNotation;
     labelDiv.classList.add("text");
     if (intersect.object.isOfTwin) {
       labelDiv.innerHTML = intersect.object.thompsonNotation
@@ -816,12 +821,92 @@ function toggleLabelAtIntersect( intersect, layers ) {
     intersect.object.attach( pointMesh );
     pointMesh.attach( label );
     lineLabels.push( pointMesh );
-  } else {
-    intersect.object.labelled = false;
-    for (var i = 0; i < intersect.object.children.length; i++ ){
-      intersect.object.children[ i ].remove(intersect.object.children[ i ].children[ 0 ] );
-      intersect.object.remove(intersect.object.children[ i ])
-    }
+  } else if (intersect.object.labelled == 1) {
+      intersect.object.labelled = 2
+
+      for (var i = 0; i < intersect.object.children.length; i++ ){
+        intersect.object.children[ i ].remove(intersect.object.children[ i ].children[ 0 ] );
+        intersect.object.remove(intersect.object.children[ i ])
+      }
+
+      var pointPos = intersect.point;
+
+      var pointGeo = new THREE.ConeGeometry( 0.02, 0.05, 3 );
+      var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1, transparent: false } );
+      var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
+      pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z); // this is where the user clicks on a line
+      pointMesh.up = intersect.object.endPoint;
+      pointMesh.lookAt(intersect.object.endPoint.x, intersect.object.endPoint.y, intersect.object.endPoint.z );
+      pointMesh.rotateX( Math.PI / 2 )
+      pointMesh.position.set( pointPos.x, pointPos.y , pointPos.z );
+
+      switch( intersect.object.material.lineType ){
+        case "full":
+          s = 0.2;
+          break;
+        case "partial":
+          s = 0.4;
+          break;
+        case "inner":
+          s = 0.6;
+          break;
+      }
+
+      switch( layers[0] ) {
+        case 1:
+          d_vec = new THREE.Vector3(0.5336, 0.5336, 0.5336);
+          break;
+        case 2:
+          d_vec = new THREE.Vector3(0.85, 0.85, 0.85);
+          break;
+      }
+
+      var labelDiv = document.createElement( 'div' );
+      labelDiv.className = 'dynamic-text-label';
+      labelDiv.idName = intersect.object.negThompsonNotation;
+      labelDiv.classList.add("text");
+      if (intersect.object.isOfTwin) {
+        labelDiv.innerHTML = intersect.object.negThompsonNotation
+      } else {
+        labelDiv.innerHTML = intersect.object.negThompsonNotation +
+        "<br>" + intersect.object.negBurgersVector
+      }
+
+      labelPos = new THREE.Vector3(
+      pointPos.x + s*(pointPos.x - d_vec.x),
+      pointPos.y + s*(pointPos.y - d_vec.y),
+      pointPos.z + s*(pointPos.z - d_vec.z))
+      labelPos.y = labelPos.y - 0.06;
+
+      labelDiv.style.marginTop = '-1em';
+      labelDiv.style.zIndex = 100;
+      labelDiv.style.fontWeight = 'bold';
+      labelDiv.style.textAlign = 'center';
+      var label = new CSS2DObject( labelDiv );
+      label.position.set(labelPos.x, labelPos.y, labelPos.z); // where to place label relative to user click position
+
+      pointMesh.position.set( pointPos.x, pointPos.y, pointPos.z); // this is where the user clicks on a line
+      pointMesh.up = intersect.object.startPoint;
+      pointMesh.lookAt(intersect.object.startPoint.x, intersect.object.startPoint.y, intersect.object.startPoint.z );
+      pointMesh.rotateX( Math.PI / 2 )
+      pointMesh.position.set( pointPos.x, pointPos.y , pointPos.z );
+
+      for (var i = 0; i < length.layers; i++) {
+      pointMesh.layers.enable( layers[ i ] );
+      }
+      intersect.object.attach( pointMesh );
+      pointMesh.attach( label );
+      lineLabels.push( pointMesh );
+
+    } else { // cleanup labels on double click
+      intersect.object.labelled = 0;
+      for (var i = 0; i < intersect.object.children.length; i++ ){
+        intersect.object.children[ i ].remove(intersect.object.children[ i ].children[ 0 ] );
+        intersect.object.remove(intersect.object.children[ i ])
+        var p_label = document.getElementById(intersect.object.ThompsonNotation);
+        var n_label = document.getElementById(intersect.object.negThompsonNotation);
+
+      }
   }
   render();
 }
