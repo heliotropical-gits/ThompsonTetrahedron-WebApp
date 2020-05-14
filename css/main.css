@@ -181,3 +181,17 @@ li {
   background: #0000ff !important;
   color: #ffffff;
 }
+
+.dynamic-text-label {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.text-label {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
