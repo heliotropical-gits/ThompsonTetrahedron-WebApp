@@ -25,7 +25,7 @@ Hosting the app simply requires you to clone / download all the files provided i
 
 As a security measure, all assets on a page need to have the same source for your browser to open it.  
 This means that if you just download everything here and open the **.html** page locally with your browser, it won't work.
-If you want to play around with the app locally and without an internet connection, you can use local server tools like e.g. [http-server](https://www.npmjs.com/package/http-server) or [browser-sync](https://www.browsersync.io/#install). Both these examples require a local installation of [node.js](https://nodejs.org)
+If you want to play around with the app locally and without an internet connection, you can use local server tools like e.g. [http-server](https://www.npmjs.com/package/http-server) or [browser-sync](https://www.browsersync.io/#install). (Both of these examples require a local installation of [node.js](https://nodejs.org)) 
 
 
 ### References
