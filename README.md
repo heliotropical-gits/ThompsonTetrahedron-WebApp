@@ -9,7 +9,7 @@ Interactivity includes:
 * Displaying a [twinning](https://en.wikipedia.org/wiki/Crystal_twinning) (mirrored) Thompson Tetrahedron, assuming (d) = (111) as the twinning plane
 * Choice of perspective or orthographic view
 
-Slip systems, dislocations splitting and reactions between several dislocations can be handily described using the Thompson notation detailed in ref. [1], which transforms large, sometimes unwieldy [Miller index](https://en.wikipedia.org/wiki/Miller_index) notation for dislocations into something akin to a linear algebra.
+Slip systems, dislocations splitting and reactions between several dislocations can be handily described using the Thompson notation detailed in ref. [1], which transforms large, sometimes unwieldy [Miller index](https://en.wikipedia.org/wiki/Miller_index) notation for dislocations into something akin to linear algebra.
 In the web app, both notations are provided, giving a handy reference to convert from one to the other, and get an orientable view of e.g. the slip systems involved in a dislocation reaction you might be interested in.
 
 Built using HTML/CSS and javascript, and licensed under GPL-v3.0-or-later [2].  
