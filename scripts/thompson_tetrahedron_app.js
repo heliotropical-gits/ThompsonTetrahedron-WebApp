@@ -968,6 +968,22 @@ function switchCamera() {
   render();
 }
 
+function checkAndWarnForBasis() {
+
+}
+
+function setAndDisplayBackgroundColor( color ) {
+
+}
+
+function exportImage( format ) {
+
+}
+
+function alignView( direction ) {
+
+}
+
 function render( ) {
   renderer.render( scene, camera );
   labelRenderer.render( scene, camera );
