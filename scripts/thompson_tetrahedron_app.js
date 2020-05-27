@@ -44,6 +44,8 @@ var pointLabels = [];
 var twinningPointLabels = [];
 var lineLabels = [];
 
+var globalInitComplete = false;
+
 var d;
 
 var coordinates_axis = [];
@@ -283,9 +285,12 @@ function init() {
   ocontrols.maxDistance = 5;
   ocontrols.zoom = 300;
   ocontrols.minZoom = 250;
+  //ocontrols.maxZoom = ;
   ocontrols.target.set( 0.5, 0.5, 0.5 );
   ocontrols.screenSpacePanning = true;
   ocontrols.update();
+
+
 
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -300,10 +305,8 @@ function init() {
 
   createCoordinateAxis();
   checkboxManager();
-  var size = 10;
-  var divisions = 10;
-
-  console.log(scene);
+  ensureWorkableIfMobile();
+  globalInitComplete = true;
 }
 
 ////////////////////// SUPPORTING FUNCTIONS AND PROCEDURES
@@ -386,6 +389,9 @@ function onWindowResize( event ) {
   pcamera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
   labelRenderer.setSize( window.innerWidth, window.innerHeight );
+
+  ensureWorkableIfMobile();
+
   render();
 }
 
@@ -637,9 +643,8 @@ function rotateCoordinateAxis(){
 
   ocamera.updateProjectionMatrix();
   pcamera.updateProjectionMatrix();
+  checkAndWarnForBasis();
 
-
-  scene
   render();
 }
 
@@ -647,12 +652,12 @@ function toggleSettings() {
   var settings = document.getElementById( "settings-sub" );
   if ( settings.style.display === "none" ) {
     settings.style.display = "block";
-    document.getElementById( "settings-toggle-text" ).innerHTML = "> hide";
+    document.getElementById( "settings-toggle-text" ).innerHTML = "> hide settings";
     document.getElementById( "settings-toggle" ).style.right = "75%";
   } else {
     settings.style.display = "none";
-    document.getElementById( "settings-toggle-text" ).innerHTML = "< show";
-    document.getElementById( "settings-toggle" ).style.right = "-10%";
+    document.getElementById( "settings-toggle-text" ).innerHTML = "< show settings";
+    document.getElementById( "settings-toggle" ).style.right = "1%";
   }
 }
 
@@ -660,12 +665,12 @@ function toggleInfo() {
   var settings = document.getElementById( "info-inner" );
   if ( settings.style.display === "none" ) {
     settings.style.display = "block";
-    document.getElementById( "info-toggle-text" ).innerHTML = "< hide";
+    document.getElementById( "info-toggle-text" ).innerHTML = "< hide help";
     document.getElementById( "info-toggle" ).style.right = "75%";
   } else {
     settings.style.display = "none";
-    document.getElementById( "info-toggle-text" ).innerHTML = "> show";
-    document.getElementById( "info-toggle" ).style.right = "-10%";
+    document.getElementById( "info-toggle-text" ).innerHTML = "> show help";
+    document.getElementById( "info-toggle" ).style.right = "1%";
   }
 }
 
@@ -969,10 +974,26 @@ function switchCamera() {
 }
 
 function checkAndWarnForBasis() {
-
+  console.log(pcontrols.zoom);
+  console.log("ocontrolszoom")
+  console.log(ocontrols.zoom);
+  // Check whether the coords basis is orthogonal and right-handed. If not, display a warning message.
+  var basis_matrix = new THREE.Matrix3();
+  basis_matrix.set(
+    x.x, x.y, x.z,
+    y.x, y.y, y.z,
+    z.x, z.y, z.z
+  )
+  var warning_message = document.getElementById("basis-warning")
+  console.log(basis_matrix.determinant());
+  if (basis_matrix.determinant() >= 0) {
+    warning_message.classList.add("hidden");
+  } else {
+    warning_message.classList.remove("hidden");
+  }
 }
 
-function setAndDisplayBackgroundColor( color ) {
+function setAndDisplayBackgroundColor() {
 
 }
 
@@ -981,6 +1002,42 @@ function exportImage( format ) {
 }
 
 function alignView( direction ) {
+
+}
+
+function ensureWorkableIfMobile() {
+  // Make it a workable webapp on a mobile device.
+  var w = window.innerWidth;
+  var h = window.innerWidth;
+  var info = document.getElementById("info");
+  var mobInfo = document.getElementById("mobile-info");
+  var footer = document.getElementsByClassName("footer")[0];
+  console.log(pcontrols.minDistance);
+  // if not a desktop
+  if ( w < 1200) {
+    if (globalInitComplete == false) {
+      toggleSettings();
+    };
+    pcontrols.minDistance = 2;
+    pcontrols.maxDistance = 5;
+    ocontrols.minZoom = 200;
+    ocontrols.maxZoom = 400;
+  }
+
+  // if a very small screen
+  if ( w < 600 ) {
+    footer.style.fontSize = "xx-small";
+    info.style.display = "none";
+    mobInfo.style.display = "block";
+    pcontrols.minDistance = 3;
+  }
+
+  if ( w >= 600 ) {
+    footer.style.fontSize = "initial";
+    mobInfo.style.display = "none";
+    info.style.display = "block";
+    pcontrols.minDistance = 2;
+  }
 
 }
 

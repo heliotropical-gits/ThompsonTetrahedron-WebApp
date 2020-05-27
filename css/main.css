@@ -4,6 +4,7 @@
 
 html, body {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -94,10 +95,14 @@ li {
 }
 
 .footer {
-  position: sticky;
-  top: 97%;
+  position: absolute;
+  bottom: 0em;
+  left: 0%;
+  right: 0%;
+  z-index: 98;
+  font-size: small;
   text-align: center;
-  z-index: 100;
+  overflow: hidden;
 }
 
 #viewport {
@@ -119,13 +124,27 @@ li {
   user-select: none; /* Standard */
 }
 
+#mobile-info {
+  position: absolute;
+  top:5px;
+	right: 75%
+	text-align: left;
+	z-index: 98;
+	display: block;
+  font-size: x-small;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+
 #settings-outer {
   position: absolute;
   width:18em;
   right: 4vw;
   top: 0.5vw;
   text-align: right;
-  display:block;
+  display: block;
   list-style-type: none;
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -138,12 +157,15 @@ li {
 #settings-sub {
   position: relative;
   background: white;
+  font-size: small;
   padding: 4px 4px 4px 4px;
   border-width: 2px;
   border-style: solid;
   border-color: #000000;
   float: right;
   right: -2.5vw;
+  overflow-y: auto;
+  z-index: 98;
 }
 
 #settings-toggle {
@@ -151,11 +173,12 @@ li {
   background: #cccccc;
   top: 1vw;
   right: 75%;
-  width: 2.5em;
+  width: 4.8em;
   height: 2.3em;
   position: absolute;
-  text-align: center;
-  padding: 0.5vw;
+  text-align: right;
+  padding-left: 1vw;
+  padding-right: 1vw;
   z-index: 100;
 }
 
@@ -164,12 +187,27 @@ li {
   background: #cccccc;
   top: 1vw;
   left: 95%;
-  width: 2.5em;
+  width: 4.8em;
   height: 2.3em;
   position: absolute;
-  text-align: center;
-  padding: 0.5vw;
+  text-align: right;
+  padding-left: -4vw;
+  padding-right: 2vw;
   z-index: 100;
+}
+
+#basis-warning {
+  top: 10vw;
+  left: 50%;
+  width: 45%;
+  position: absolute;
+  text-align: center;
+  font-weight: bold;
+  z-index: 97;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .toggler:hover {
@@ -194,4 +232,19 @@ li {
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Addendum for non-desktop compatibilities */
+
+@media (max-width: 1200px) {
+  .dynamic-text-label {
+    font-size = x-small !important;
+  }
+  .text-label {
+    font-size = x-small !important;
+  }
 }
