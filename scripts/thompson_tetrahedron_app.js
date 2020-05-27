@@ -678,7 +678,7 @@ function toggleInfo() {
 function labelVertices( toLabel, layer ) {
   for (var i = 0; i < toLabel.length; i++ ) {
     var pointPos = vectorFromTetrahedronVertex( toLabel[ i ] );
-    var labelPos, d_vec;
+    var labelPos, d_vec, c_vec;
     var pointGeo = new THREE.SphereBufferGeometry( 0.008, 20, 20 );
     var pointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 1.0, transparent: false } );
     var pointMesh = new THREE.Mesh( pointGeo, pointMaterial );
@@ -687,13 +687,19 @@ function labelVertices( toLabel, layer ) {
     switch( layer ) {
       case 13:
         d_vec = new THREE.Vector3(0.5336, 0.5336, 0.5336);
+        c_vec = new THREE.Vector3(1.0, 0.0, -1.0);
         break;
       case 14:
         d_vec = new THREE.Vector3(0.85, 0.85, 0.85);
+        c_vec = new THREE.Vector3(0.85, 0.0, 0.85);
         break;
     }
-    labelPos = new THREE.Vector3( pointPos.x - d_vec.x, pointPos.y - d_vec.y , pointPos.z - d_vec.z ).setLength(0.07)
-    labelPos.y = labelPos.y - 0.06;
+    labelPos = new THREE.Vector3( pointPos.x - d_vec.x , pointPos.y - d_vec.y , pointPos.z - d_vec.z )
+    labelPos.y = labelPos.y - 0.24;
+    labelPos.x = labelPos.x + 0.5 * labelPos.x * c_vec.x
+    labelPos.z = labelPos.z + 0.5 * labelPos.z * c_vec.z
+
+    labelPos.setLength(0.07)
 
     var labelDiv = document.createElement( 'div' );
     labelDiv.className = 'text-label';
