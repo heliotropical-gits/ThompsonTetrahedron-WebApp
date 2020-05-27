@@ -1020,8 +1020,9 @@ function ensureWorkableIfMobile() {
   var footer = document.getElementsByClassName("footer")[0];
   console.log(pcontrols.minDistance);
   // if not a desktop
-  if ( w < 1200) {
+  if ( w < 900) {
     if (globalInitComplete == false) {
+      toggleInfo();
       toggleSettings();
     };
     pcontrols.minDistance = 2;
@@ -1033,16 +1034,17 @@ function ensureWorkableIfMobile() {
   // if a very small screen
   if ( w < 600 ) {
     footer.style.fontSize = "xx-small";
-    info.style.display = "none";
-    mobInfo.style.display = "block";
     pcontrols.minDistance = 3;
   }
 
   if ( w >= 600 ) {
     footer.style.fontSize = "initial";
-    mobInfo.style.display = "none";
-    info.style.display = "block";
     pcontrols.minDistance = 2;
+  }
+
+  if ( h < 300 ) {
+    pcontrols.minDistance = 3;
+    pcontrols.maxDistance = 7;
   }
 
 }

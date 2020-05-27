@@ -238,13 +238,34 @@ li {
   display: none !important;
 }
 
-/* Addendum for non-desktop compatibilities */
+#mobile-info  {
+  display: none;
+}
 
-@media (max-width: 1200px) {
+/* Addendum for non-desktop compatibilities */
+@media (max-width: 900px) and (max-height: 400px){
   .dynamic-text-label {
-    font-size = x-small !important;
+    font-size: small !important;
   }
   .text-label {
-    font-size = x-small !important;
+    font-size: small !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #mobile-info {
+    display: block;
+  }
+  #info {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) and (max-height: 300px) {
+  .dynamic-text-label {
+    font-size: x-small !important;
+  }
+  .text-label {
+    font-size: x-small !important;
   }
 }
