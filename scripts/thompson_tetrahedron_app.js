@@ -306,6 +306,7 @@ function init() {
   document.getElementById( "info-toggle" ).addEventListener( 'click', toggleInfo, false );
   document.getElementById( "camera-switch" ).addEventListener( 'click', switchCamera, false );
   document.getElementById( "clear-labels-button" ).addEventListener( 'click', clearLabels, false );
+  document.getElementById( "apply-bg-color" ).addEventListener( 'click', function(){ setAndDisplayBackgroundColor() }, false );
   document.getElementById( "align-xy" ).addEventListener( 'click', alignView, false );
   document.getElementById( "align-yz" ).addEventListener( 'click', alignView, false );
   document.getElementById( "align-zx" ).addEventListener( 'click', alignView, false );
@@ -1048,7 +1049,7 @@ function exportImage( format ){
   switch( format ) {
     case "png":
       outputPNG( checkIfAnyTwinningIsDisplayed() );
-      break;  
+      break;
   }
 }
 
