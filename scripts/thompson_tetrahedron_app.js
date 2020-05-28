@@ -27,6 +27,8 @@ import * as THREE from './three/build/three.module.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from './three/examples/jsm/renderers/CSS2DRenderer.js';
 
+// Globals
+{
 var container, pcontrols, ocontrols, controls;
 var ocamera, pcamera;
 var camera, scene, renderer, labelRenderer;
@@ -43,6 +45,8 @@ var planeLabels = [];
 var pointLabels = [];
 var twinningPointLabels = [];
 var lineLabels = [];
+
+var infoIsHidden = false;
 
 var globalInitComplete = false;
 
@@ -73,6 +77,7 @@ var line_materials = [];
 var rollOverMaterial, rollOverMesh;
 
 var raycaster, mouse;
+}
 
 init();
 render();
@@ -285,7 +290,7 @@ function init() {
   ocontrols.maxDistance = 5;
   ocontrols.zoom = 300;
   ocontrols.minZoom = 250;
-  //ocontrols.maxZoom = ;
+  ocontrols.maxZoom = 700;
   ocontrols.target.set( 0.5, 0.5, 0.5 );
   ocontrols.screenSpacePanning = true;
   ocontrols.update();
@@ -301,6 +306,9 @@ function init() {
   document.getElementById( "info-toggle" ).addEventListener( 'click', toggleInfo, false );
   document.getElementById( "camera-switch" ).addEventListener( 'click', switchCamera, false );
   document.getElementById( "clear-labels-button" ).addEventListener( 'click', clearLabels, false );
+  document.getElementById( "align-xy" ).addEventListener( 'click', alignView( "xy" ), false );
+  document.getElementById( "align-yz" ).addEventListener( 'click', alignView( "yz" ), false );
+  document.getElementById( "align-zx" ).addEventListener( 'click', alignView( "zx" ), false );
   window.addEventListener( 'resize', onWindowResize, false );
 
   createCoordinateAxis();
@@ -367,18 +375,18 @@ function removeTextFromView( list ) {
   }
 }
 
-function addLayerToViewAndRaycaster( layer ){
+function addLayerToViewAndRaycaster( layer ) {
   camera.layers.enable( layer );
   raycaster.layers.enable( layer );
 }
 
-function removeLayerFromViewAndRaycaster( layer ){
+function removeLayerFromViewAndRaycaster( layer ) {
   camera.layers.disable( layer );
   raycaster.layers.disable( layer );
 }
 
-// resize the camera aspect ratio accordingly if window resized
 function onWindowResize( event ) {
+  /* resize the camera aspect ratio accordingly if window resized */
   pcamera.aspect = window.innerWidth / window.innerHeight;
   ocamera.left = window.innerWidth / -2;
   ocamera.right = window.innerWidth / 2;
@@ -395,9 +403,10 @@ function onWindowResize( event ) {
   render();
 }
 
-// Check for mouse movement and intersection with object.
-// Interact with first object from camera.
 function onDocumentMouseMove( event ) {
+  /* Check for mouse movement and intersection with object.
+  Interact with first object from camera. */
+
   mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1.000, - ( event.clientY / window.innerHeight ) * 2 + 1.00 );
   raycaster.setFromCamera( mouse, camera );
   var intersects = raycaster.intersectObjects( lines, true );
@@ -417,15 +426,15 @@ function onDocumentMouseMove( event ) {
   render();
 }
 
-// Check for mouse movement and intersection with object.
-// Interact with first object from camera that's intersected with mouse.
-function onDocumentMouseDown( event ){
+function onDocumentMouseDown( event ) {
+  /* Check for mouse movement and intersection with object.
+  Interact with first object from camera that's intersected with mouse. */
+
   mouseDownDate = Date.now();
   render();
 }
 
-
-function onDocumentMouseUp( event ){
+function onDocumentMouseUp( event ) {
   // Added date comparison to ensure we don't set labels while rotating
   mouseUpDate = Date.now();
   if (mouseUpDate - mouseDownDate < 200 ) {
@@ -453,7 +462,7 @@ function onDocumentMouseUp( event ){
   render();
 }
 
-function makeLinesFromPairs(pointsPairs, materialToUse, twinningCase = false){
+function makeLinesFromPairs( pointsPairs, materialToUse, twinningCase = false ){
   var b_length, prefactor, material;
   if (materialToUse === "full") {
     b_length = 1.414213562373095;
@@ -561,7 +570,7 @@ function vectorFromTetrahedronVertex( vertex ) {
   )
 }
 
-function createCoordinateAxis(){
+function createCoordinateAxis() {
   //// Everything coordinate axis - related
   // set their material
   line_materials.push( new THREE.LineBasicMaterial( { color: 0xff0000 } ) );
@@ -599,7 +608,7 @@ function createCoordinateAxis(){
   rotateCoordinateAxis();
 }
 
-function readBasisCoordinateInput(){
+function readBasisCoordinateInput() {
   x.x = parseInt( document.getElementById( "xx" ).value );
   x.y = parseInt( document.getElementById( "xy" ).value );
   x.z = parseInt( document.getElementById( "xz" ).value );
@@ -614,7 +623,7 @@ function readBasisCoordinateInput(){
   z.setLength( 3 );
 }
 
-function rotateCoordinateAxis(){
+function rotateCoordinateAxis() {
   // Read current desired orientation
   readBasisCoordinateInput();
   var lx = new THREE.BufferGeometry().setFromPoints( [ o, x ] );
@@ -650,6 +659,7 @@ function rotateCoordinateAxis(){
 
 function toggleSettings() {
   var settings = document.getElementById( "settings-sub" );
+  console.log("ping")
   if ( settings.style.display === "none" ) {
     settings.style.display = "block";
     document.getElementById( "settings-toggle-text" ).innerHTML = "> hide settings";
@@ -663,19 +673,36 @@ function toggleSettings() {
 
 function toggleInfo() {
   var settings = document.getElementById( "info-inner" );
-  if ( settings.style.display === "none" ) {
+  if ( infoIsHidden == true ) {
     settings.style.display = "block";
     document.getElementById( "info-toggle-text" ).innerHTML = "< hide help";
     document.getElementById( "info-toggle" ).style.right = "75%";
-  } else {
+    infoIsHidden = false;
+  } else if ( infoIsHidden == false ){
     settings.style.display = "none";
     document.getElementById( "info-toggle-text" ).innerHTML = "> show help";
     document.getElementById( "info-toggle" ).style.right = "1%";
+    infoIsHidden = true;
   }
 }
 
-// Puts a label on a list of provided vertices, just done at start up
+function forceToggleInfo( forceHide = true ) {
+  var settings = document.getElementById( "info-inner" );
+  if ( infoIsHidden == true && forceHide == false ) {
+    settings.style.display = "block";
+    document.getElementById( "info-toggle-text" ).innerHTML = "< hide help";
+    document.getElementById( "info-toggle" ).style.right = "75%";
+    infoIsHidden = false;
+  } else if ( infoIsHidden == false || forceHide == true ){
+    settings.style.display = "none";
+    document.getElementById( "info-toggle-text" ).innerHTML = "> show help";
+    document.getElementById( "info-toggle" ).style.right = "1%";
+    infoIsHidden = true;
+  }
+}
+
 function labelVertices( toLabel, layer ) {
+  // Puts a label on a list of provided vertices, just done at start up
   for (var i = 0; i < toLabel.length; i++ ) {
     var pointPos = vectorFromTetrahedronVertex( toLabel[ i ] );
     var labelPos, d_vec, c_vec;
@@ -761,9 +788,9 @@ function labelVertices( toLabel, layer ) {
   }
 }
 
-/* Gets an intersect position and information and creates a text label locally
-containing all Thompson vector information of the intersect */
 function toggleLabelAtIntersect( intersect, layers ) {
+  /* Gets an intersect position and information and creates a text label locally
+  containing all Thompson vector information of the intersect */
   var d_vec, labelPos, s;
   if (intersect.object.labelled != 1 && intersect.object.labelled != 2) { // 1 is one way, 2 is the other way, 0 is not-labelled.
     intersect.object.labelled = true;
@@ -1021,31 +1048,41 @@ function ensureWorkableIfMobile() {
   console.log(pcontrols.minDistance);
   // if not a desktop
   if ( w < 900) {
+
+    // on init only
     if (globalInitComplete == false) {
-      toggleInfo();
       toggleSettings();
     };
+
     pcontrols.minDistance = 2;
     pcontrols.maxDistance = 5;
     ocontrols.minZoom = 200;
     ocontrols.maxZoom = 400;
+    forceToggleInfo();
   }
-
+w
   // if a very small screen
   if ( w < 600 ) {
-    footer.style.fontSize = "xx-small";
     pcontrols.minDistance = 3;
   }
 
-  if ( w >= 600 ) {
-    footer.style.fontSize = "initial";
+  if ( w >= 900 ) {
     pcontrols.minDistance = 2;
+    ocontrols.maxZoom = 700;
   }
 
   if ( h < 300 ) {
     pcontrols.minDistance = 3;
     pcontrols.maxDistance = 7;
   }
+
+}
+
+function checkIfAnyTwinningIsDisplayed() {
+
+}
+
+function makeGlobalBoundingBoxes() {
 
 }
 

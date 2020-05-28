@@ -26,6 +26,14 @@ input {
   font-weight: normal;
 }
 
+button {
+  text-align: center;
+}
+
+button#export-png {
+  font-size: x-small;
+}
+
 .warning-no-script {
   text-align: center;
   position: absolute;
@@ -263,9 +271,47 @@ li {
 
 @media (max-width: 600px) and (max-height: 300px) {
   .dynamic-text-label {
-    font-size: x-small !important;
+    font-size: small !important;
   }
   .text-label {
+    font-size: small !important;
+  }
+  .footer {
+    font-size: xx-small !important;
+  }
+}
+
+@media (max-width: 350px) and (max-height: 700px ) {
+  .dynamic-text-label {
+    font-size: small !important;
+  }
+  .text-label {
+    font-size: small !important;
+  }
+  .footer {
+    font-size: xx-small !important;
+  }
+  span {
+    font-size: x-small;
+  }
+  #settings-outer {
+    left: 2%;
+    top: -18%;
+    width: 96%;
     font-size: x-small !important;
+  }
+  #settings-sub {
+    width: 100%;
+    font-size: xx-small !important;
+  }
+  #settings-toggle {
+    height: 15vw;
+  }
+  #mobile-info{
+    position: absolute;
+    top: 9vw;
+  }
+  .footer {
+    font-size: xx-small;
   }
 }
