@@ -306,9 +306,11 @@ function init() {
   document.getElementById( "info-toggle" ).addEventListener( 'click', toggleInfo, false );
   document.getElementById( "camera-switch" ).addEventListener( 'click', switchCamera, false );
   document.getElementById( "clear-labels-button" ).addEventListener( 'click', clearLabels, false );
-  document.getElementById( "align-xy" ).addEventListener( 'click', alignView( "xy" ), false );
-  document.getElementById( "align-yz" ).addEventListener( 'click', alignView( "yz" ), false );
-  document.getElementById( "align-zx" ).addEventListener( 'click', alignView( "zx" ), false );
+  document.getElementById( "align-xy" ).addEventListener( 'click', alignView, false );
+  document.getElementById( "align-yz" ).addEventListener( 'click', alignView, false );
+  document.getElementById( "align-zx" ).addEventListener( 'click', alignView, false );
+  document.getElementById( "export-png" ).addEventListener( 'mouseover', highlightImageOutputView, false );
+  document.getElementById( "export-png" ).addEventListener( 'click', function(){ exportImage("png") }, false );
   window.addEventListener( 'resize', onWindowResize, false );
 
   createCoordinateAxis();
@@ -949,7 +951,7 @@ function toggleLabelAtIntersect( intersect, layers ) {
   render();
 }
 
-function clearLabels( ) {
+function clearLabels() {
   for (var i = 0; i < lineLabels.length; i++){
     scene.remove( lineLabels[ i ] )
   }
@@ -1030,12 +1032,48 @@ function setAndDisplayBackgroundColor() {
 
 }
 
-function exportImage( format ) {
+function makeGlobalBoundingBoxes() {
 
 }
 
-function alignView( direction ) {
+function checkIfAnyTwinningIsDisplayed() {
 
+}
+
+function highlightImageOutputView() {
+
+}
+
+function exportImage( format ){
+  switch( format ) {
+    case "png":
+      outputPNG( checkIfAnyTwinningIsDisplayed() );
+      break;  
+  }
+}
+
+function outputPNG( twinning ) {
+  if ( twinning == true ) {
+    // output 2D project of canvas w limits of big bounding box which includes twin objects
+  } else {
+    // output 2D project of canvas w limits of small bounding box
+  }
+}
+
+function alignView( event ) {
+  var directionToAlign = event.target.id;
+  var viewDirection = new THREE.Vector3();
+  switch( directionToAlign ){
+    case "align-xy":
+
+      break;
+    case "align-yz":
+
+      break;
+    case "align-zx":
+
+      break;
+  }
 }
 
 function ensureWorkableIfMobile() {
@@ -1075,14 +1113,6 @@ w
     pcontrols.minDistance = 3;
     pcontrols.maxDistance = 7;
   }
-
-}
-
-function checkIfAnyTwinningIsDisplayed() {
-
-}
-
-function makeGlobalBoundingBoxes() {
 
 }
 
