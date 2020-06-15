@@ -280,7 +280,9 @@ function init() {
   pcontrols.addEventListener( 'change', render );
   pcontrols.minDistance = 2.5;
   pcontrols.maxDistance = 5;
-  pcontrols.target.set( 0.5, 0.5, 0.5 );
+  pcontrols.maxPolarAngle = Infinity;
+  pcontrols.minPolarAngle = -Infinity;
+  pcontrols.target.set( 0.667, 0.667, 0.667 );
   pcontrols.screenSpacePanning = true;
   pcontrols.update();
 
@@ -291,11 +293,9 @@ function init() {
   ocontrols.zoom = 300;
   ocontrols.minZoom = 250;
   ocontrols.maxZoom = 700;
-  ocontrols.target.set( 0.5, 0.5, 0.5 );
+  ocontrols.target.set( 0.667, 0.667, 0.667 );
   ocontrols.screenSpacePanning = true;
   ocontrols.update();
-
-
 
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -306,7 +306,8 @@ function init() {
   document.getElementById( "info-toggle" ).addEventListener( 'click', toggleInfo, false );
   document.getElementById( "camera-switch" ).addEventListener( 'click', switchCamera, false );
   document.getElementById( "clear-labels-button" ).addEventListener( 'click', clearLabels, false );
-  document.getElementById( "apply-bg-color" ).addEventListener( 'click', function(){ setAndDisplayBackgroundColor() }, false );
+  document.getElementById( "background-color-apply" ).addEventListener( 'click',
+    function(){ setAndDisplayBackgroundColor( document.getElementById("background-color").value ) }, false );
   document.getElementById( "align-xy" ).addEventListener( 'click', alignView, false );
   document.getElementById( "align-yz" ).addEventListener( 'click', alignView, false );
   document.getElementById( "align-zx" ).addEventListener( 'click', alignView, false );
@@ -645,24 +646,35 @@ function rotateCoordinateAxis() {
   scene.add( ly_mesh );
   scene.add( lz_mesh );
 
-  ocamera.up = new THREE.Vector3(y.x, y.y, y.z)
-  ocontrols.up = new THREE.Vector3(y.x, y.y, y.z)
-  ocontrols.target.set(0.5, 0.5, 0.5);
-  pcamera.up = new THREE.Vector3(y.x, y.y, y.z)
-  pcontrols.up = new THREE.Vector3(y.x, y.y, y.z)
-  pcontrols.target.set(0.5, 0.5, 0.5);
-  scene.up = new THREE.Vector3(y.x, y.y, y.z)
+  var matrixTransform = new THREE.Matrix4()
+  matrixTransform.makeBasis(x.normalize(), y.normalize(), z.normalize());
 
-  ocamera.updateProjectionMatrix();
-  pcamera.updateProjectionMatrix();
+  //ocamera.up = new THREE.Vector3(y.x, y.y, y.z)
+  //pcamera.up = new THREE.Vector3(y.x, y.y, y.z)
+  //ocontrols.object.applyMatrix4( matrixTransform )
+
+  //pcontrols.object.applyMatrix4( matrixTransform )
+  ocontrols.object.up = new THREE.Vector3(y.x, y.y, y.z)
+  pcontrols.object.up = new THREE.Vector3(y.x, y.y, y.z)
+  ocontrols.update();
+  pcontrols.update();
+  //scene.applyMatrix4( matrixTransform )
+  //ocontrols.target.set(0.5, 0.5, 0.5);
+  //pcamera.up = new THREE.Vector3(y.x, y.y, y.z)
+  //pcontrols.object.up = new THREE.Vector3(y.x, y.y, y.z)
+  //pcontrols.target.set(0.5, 0.5, 0.5);
+  scene.up = new THREE.Vector3(y.x, y.y, y.z)
+  //pcamera.up = new THREE.Vector3(y.x, y.y, y.z)
+
   checkAndWarnForBasis();
+  console.log(pcamera)
 
   render();
 }
 
 function toggleSettings() {
   var settings = document.getElementById( "settings-sub" );
-  console.log("ping")
+  //console.log("ping")
   if ( settings.style.display === "none" ) {
     settings.style.display = "block";
     document.getElementById( "settings-toggle-text" ).innerHTML = "> hide settings";
@@ -744,8 +756,6 @@ function labelVertices( toLabel, layer ) {
     labelDiv.style.marginTop = '-1em';
     labelDiv.style.zIndex = 95;
     labelDiv.style.display = "block";
-
-
 
     var label = new CSS2DObject( labelDiv );
     label.position.set(labelPos.x, labelPos.y, labelPos.z);
@@ -1006,13 +1016,12 @@ function switchCamera() {
       camera = pcamera;
       break;
   }
+  pcontrols.update();
+  ocontrols.update();
   render();
 }
 
 function checkAndWarnForBasis() {
-  console.log(pcontrols.zoom);
-  console.log("ocontrolszoom")
-  console.log(ocontrols.zoom);
   // Check whether the coords basis is orthogonal and right-handed. If not, display a warning message.
   var basis_matrix = new THREE.Matrix3();
   basis_matrix.set(
@@ -1021,7 +1030,6 @@ function checkAndWarnForBasis() {
     z.x, z.y, z.z
   )
   var warning_message = document.getElementById("basis-warning")
-  console.log(basis_matrix.determinant());
   if (basis_matrix.determinant() >= 0) {
     warning_message.classList.add("hidden");
   } else {
@@ -1029,8 +1037,8 @@ function checkAndWarnForBasis() {
   }
 }
 
-function setAndDisplayBackgroundColor() {
-
+function setAndDisplayBackgroundColor( color ) {
+  scene.background = new THREE.Color( color )
 }
 
 function makeGlobalBoundingBoxes() {
@@ -1059,22 +1067,40 @@ function outputPNG( twinning ) {
   } else {
     // output 2D project of canvas w limits of small bounding box
   }
+  console.log(pcontrols.object)
+  console.log(ocontrols.object)
 }
 
 function alignView( event ) {
   var directionToAlign = event.target.id;
-  var viewDirection = new THREE.Vector3();
+  var cP = new THREE.Vector3(x.x * 0.667, y.y * 0.667, z.z * 0.667);
+
   switch( directionToAlign ){
     case "align-xy":
-
+      cP.z = z.z * 4
       break;
     case "align-yz":
-
+      cP.x = x.x * 4
       break;
     case "align-zx":
-
+      cP.y = y.y * 4
       break;
   }
+
+  pcontrols.target.set(x.x * 0.667, y.y * 0.667, z.z * 0.667);
+  pcontrols.object.position.set(cP.x, cP.y, cP.z);
+  pcontrols.update();
+
+  ocontrols.target.set(x.x * 0.667, y.y * 0.667, z.z * 0.667);
+  ocontrols.object.position.set(cP.x, cP.y, cP.z);
+  ocontrols.update();
+
+  var phelper = new THREE.CameraHelper( pcamera );
+  //var ohelper = new THREE.CameraHelper( ocamera );
+  scene.add(phelper)
+  //scene.add(ohelper)
+
+  render();
 }
 
 function ensureWorkableIfMobile() {
@@ -1084,7 +1110,7 @@ function ensureWorkableIfMobile() {
   var info = document.getElementById("info");
   var mobInfo = document.getElementById("mobile-info");
   var footer = document.getElementsByClassName("footer")[0];
-  console.log(pcontrols.minDistance);
+  // console.log(pcontrols.minDistance);
   // if not a desktop
   if ( w < 900) {
 
@@ -1099,7 +1125,6 @@ function ensureWorkableIfMobile() {
     ocontrols.maxZoom = 400;
     forceToggleInfo();
   }
-w
   // if a very small screen
   if ( w < 600 ) {
     pcontrols.minDistance = 3;
@@ -1114,8 +1139,10 @@ w
     pcontrols.minDistance = 3;
     pcontrols.maxDistance = 7;
   }
-
+pcontrols.update();
+ocontrols.update();
 }
+
 
 function render( ) {
   renderer.render( scene, camera );

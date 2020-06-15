@@ -14,6 +14,7 @@
 	</head>
 	<body>
     <script type='module' src='scripts/thompson_tetrahedron_app.js'></script>
+		<script src='scripts/jscolor.js'></script>
 		<noscript>
 			<div class="warning-no-script">
 				"Your browser does not support javascript, or you've disabled scripts using e.g. NoScript. Please enable scripts to use the Thompson Tetrahedron."
@@ -158,6 +159,13 @@
 								<button type="button" id="align-xy">xy</button>
 								<button type="button" id="align-yz">yz</button>
 								<button type="button" id="align-zx">zx</button>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="property-name">Background Color</span><br>
+								<span>(HEX code, see <a href=https://htmlcolorcodes.com/color-picker/#>here</a>.)</span>
+								<input type="text" id="background-color" value=#ffffff> <button type="button" id="background-color-apply">Apply</button>
 							</div>
 						</li>
 					</ul>
