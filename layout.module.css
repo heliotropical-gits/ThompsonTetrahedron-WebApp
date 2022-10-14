@@ -1,8 +1,8 @@
 :root {
   --text-light: white;
   --text-dark: black;
-  --theme-background: #ff6600;
-  --theme-button: #bb3300;
+  --theme-background: #bb3300;
+  --theme-button: #aa1100;
 }
 
 @media screen and (min-width: 500px) {
@@ -213,11 +213,11 @@ i {
   max-width: 1000px;
   font-family: sans-serif;
   margin: 0;
-  font-family: sans-serif;
 }
 
 .heading {
   color: var(--theme-background);
+  text-align: center;
 }
 .nav-links {
   display: flex;

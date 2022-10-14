@@ -20,7 +20,9 @@ const PortfolioEntry = ( {node} ) => {
       <a className={entryBox} href={data.entrylink}>
 
       <div className={entryTitleBox}>
-        <p className={entryTitleText}>{data.title}</p>
+        <p className={entryTitleText}>
+          {data.title}
+        </p>
         <a href={data.techlink} className={entryTechText}>
           <span>
             {data.tech}
