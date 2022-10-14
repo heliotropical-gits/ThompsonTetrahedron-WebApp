@@ -1,30 +1,43 @@
 import * as React from 'react'
 import {
-  container,
   entryBox,
   entryImage,
   entryTitle,
+  entryTitleBox,
+  entryTitleText,
+  entryTechText,
+  entryDetailsText,
+  portfolioLink
 } from './portfolio_entry.module.css'
 import { Link } from 'gatsby'
-import { StaticImage } from 'gatsby-plugin-image'
+import { GatsbyImage, getImage } from 'gatsby-plugin-image'
 import { MDXRenderer } from 'gatsby-plugin-mdx'
 
 const PortfolioEntry = ( {node} ) => {
+  const data = node.frontmatter
+  const image = getImage(data.hero_image)
   return (
-    <div className={container}>
-      {
-        // Change link to new object if decide to make it a pop-out box
-      }
-      <Link className={entryBox} to={node.frontmatter.entrylink.relativePath}>
-      <p className={entryTitle}>
-        {node.frontmatter.title} / {node.frontmatter.tech}
-      </p>      
-      <StaticImage className={entryImage}
-        alt={node.frontmatter.hero_image_alt}
-        src={node.frontmatter.hero_image.relativePath}
+      <a className={entryBox} href={data.entrylink}>
+
+      <div className={entryTitleBox}>
+        <p className={entryTitleText}>{data.title}</p>
+        <a href={data.techlink} className={entryTechText}>
+          <span>
+            {data.tech}
+          </span>
+        </a>
+      </div>
+
+      <GatsbyImage className={entryImage}
+        image={image}
+        alt={data.hero_image_alt}
       />
-      </Link>
-    </div>
+
+      <div className={entryDetailsText}>
+        {data.abstract}
+      </div>
+
+      </a>
   )
 }
 export default PortfolioEntry

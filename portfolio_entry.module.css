@@ -1,0 +1,87 @@
+:root {
+  --box-background: #bb3300;
+  --info-background: #ff6600;
+}
+
+.entry-box {
+  max-width: 30%;
+  background-color: var(--info-background);
+  padding-top: 0.1em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  padding-bottom: 0.1em;
+  border-radius: 15px;
+  margin: 5px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  text-decoration: none;
+  color: white;
+}
+
+.entry-box:hover {
+  color: black;
+  border-style: solid;
+  border-color: black;
+  border-width: 0px 5px 5px 0px;
+  margin: 0;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  margin-left: 5px;
+}
+
+.entry-title-box {
+  margin: 10px 0 15px 0;
+  text-align: center;
+  font-size: 1em;
+  color: inherit;
+}
+
+.entry-title-text {
+  margin: 0.5em;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.entry-tech-text {
+  margin: 1em;
+  padding: 0.3em;
+  font-weight: normal;
+  color: white;
+  background-color: var(--box-background);
+  border-radius: 10px;
+}
+
+.entry-tech-text:hover {
+  color: black;
+  border-style: solid;
+  border-width: 0px 3px 3px 0px;
+  margin: 0;
+  margin-left: 3px;
+
+}
+
+.entry-image {
+  border-radius: 10px;
+}
+
+.portfolio-link {
+  text-decoration: none;
+}
+
+.entry-details-text {
+  margin: 10px 0 10px 0;
+  text-align: center;
+  text-decoration: none;
+  font-size: 1em;
+  color: inherit;
+  border-radius: 10px;
+  padding: 0.3em 0.3em 0.3em 0.3em;
+  background-color: var(--box-background);
+}
+
+/* Small screen supported below */
+@media screen and (max-width: 500px) {
+  .entry-box {
+    max-width: 90%;
+  }
+}

@@ -195,6 +195,15 @@ i {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
+
+.portfolio-container {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  align-items: stretch;
+  align-content: stretch;
+}
+
 }
 
 /* Small screen supported below */
@@ -391,4 +400,13 @@ i {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
+
+.portfolio-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: stretch;
+  align-content: stretch;
+}
+
 }
