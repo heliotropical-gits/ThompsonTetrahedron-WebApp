@@ -1,0 +1,157 @@
+@media screen and (min-width: 500px) {
+.container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.entry-dates-box {
+  margin: 30px;
+  margin-left: 2px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  min-width: 10%;
+  max-width: 50%;
+  justify-content: flex-start;
+}
+
+.entry-dates-title {
+  margin-top: 5px;
+  min-width: 100%;
+  text-align: right;
+}
+
+.entry-details-box {
+  margin: 0px 10px 0px 0px;
+  margin-right: 2px;
+  min-width: 80%;
+  max-width: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  flex-grow: 1;
+  flex-shrink: 2;
+  flex-basis: 15px;
+}
+
+.entry-details-title {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: left;
+  min-width: 80%;
+}
+
+.entry-details-subtitle {
+  margin: 0px;
+  font-size: 16px;
+  min-width: 80%;
+  text-align: left;
+}
+
+.entry-details-text {
+  line-height: 1em;
+}
+
+ul {
+  padding-left: 1em;
+}
+
+li {
+  margin: 10px 0;
+  line-height: 1.2rem;
+}
+
+.entry-pub-details-authors {
+  min-width: 100%;
+  font-weight: normal;
+  font-size: 1rem;
+  margin: 0px;
+  margin-bottom: 5px;
+}
+.entry-pub-details-citation {
+  min-width: 100%;
+  font-weight: normal;
+  font-size: 1em;
+  margin: 0px;
+}
+}
+
+/* Small screen support here below */
+
+
+@media screen and (max-width: 500px) {
+  .container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .entry-dates-box {
+    margin: 0;
+    min-width: 10%;
+    max-width: 50%;
+    justify-content: flex-start;
+  }
+
+  .entry-dates-title {
+    margin-top: 5px;
+    min-width: 100%;
+    text-align: right;
+  }
+
+  .entry-details-box {
+    margin: 0;
+    min-width: 90%;
+    max-width: 90%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    flex-grow: 1;
+    flex-shrink: 2;
+    flex-basis: 15px;
+  }
+
+  .entry-details-title {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: left;
+    min-width: 100%;
+    font-size: 16px;
+  }
+
+  .entry-details-subtitle {
+    margin: 0;
+    font-size: 14px;
+    min-width: 100%;
+    text-align: left;
+  }
+
+  .entry-details-text {
+    line-height: 1em;
+  }
+
+  ul {
+    padding-left: 0em;
+  }
+
+  li {
+    line-height: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .entry-pub-details-authors {
+    min-width: 100%;
+    font-weight: normal;
+    font-size: 1rem;
+    margin: 0px;
+    margin-bottom: 5px;
+  }
+  .entry-pub-details-citation {
+    min-width: 100%;
+    font-weight: normal;
+    font-size: 1rem;
+    margin-top: 0;
+  }
+}
