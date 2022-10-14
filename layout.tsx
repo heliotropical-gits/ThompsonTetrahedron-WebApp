@@ -57,25 +57,25 @@ const Layout = ({ pageTitle, children }) => {
         <p className={socialHeaderText}>Connect with me on:</p>
         <ul className={socialLinks}>
           <li className={socialLinkItem}>
-            <a className={socialLinkText} to="https://www.linkedin.com/in/fr%C3%A9d%C3%A9ric-houll%C3%A9-6b764673/">
+            <a className={socialLinkText} href="https://www.linkedin.com/in/fr%C3%A9d%C3%A9ric-houll%C3%A9-6b764673/">
               <i class="fa-brands fa-linkedin"></i>
               LinkedIn
             </a>
           </li>
           <li className={socialLinkItem}>
-            <a className={socialLinkText} to="https://github.com/heliotropical-gits">
+            <a className={socialLinkText} href="https://github.com/heliotropical-gits">
               <i class="fa-brands fa-square-github"></i>
               Github
             </a>
           </li>
           <li className={socialLinkItem}>
-            <a className={socialLinkText} to="https://web.facebook.com/frederic.houlle/">
+            <a className={socialLinkText} href="https://web.facebook.com/frederic.houlle/">
               <i class="fa-brands fa-square-facebook"></i>
               Facebook
             </a>
           </li>
           <li className={socialLinkItem}>
-            <a className={socialLinkText} to="https://www.instagram.com/vagabond_chameleon/">
+            <a className={socialLinkText} href="https://www.instagram.com/vagabond_chameleon/">
               <i class="fa-brands fa-square-instagram social-icon"></i>
               Instagram
             </a>
@@ -83,7 +83,7 @@ const Layout = ({ pageTitle, children }) => {
         </ul>
       </div>
       <div className={copyright}>
-        © Frédéric Houllé 2022, made with <a to="https://www.gatsbyjs.com">Gatsby</a>, all rights reserved.
+        © Frédéric Houllé 2022, made with <a href="https://www.gatsbyjs.com">Gatsby</a>, all rights reserved.
       </div>
       </main>
     </div>
